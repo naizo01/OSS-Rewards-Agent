@@ -21,6 +21,11 @@ OSS-Rewards-Agent is a groundbreaking open source support project that matches c
    - Authentication through GitHub account is required to claim rewards
    - Only contributors whose pull requests are merged can claim the reward for the corresponding issue
 
+## System Architecture
+
+![](./public/architecture.png)
+
+
 ## Security Features
 
 The system ensures secure reward distribution through:
