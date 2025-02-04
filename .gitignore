@@ -1,0 +1,17 @@
+
+# dependencies
+/node_modules
+.node-version
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.*
+!.env.sample
+!.env.example
+.env
+.env.local
+
+__pycache__
