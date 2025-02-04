@@ -1,6 +1,6 @@
 # OSS-Rewards-Agent
 
-![](./public/cover.jpg)
+![](./public/cover.png)
 
 ## Overview
 
