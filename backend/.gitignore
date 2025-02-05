@@ -1,0 +1,8 @@
+ai_hackathon
+.env
+.pyc
+__pycache__
+*.lock
+
+wallet_data*
+app.log
