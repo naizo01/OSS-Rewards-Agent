@@ -1,6 +1,7 @@
 import os
 import constants
 import json
+import requests
 
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
@@ -20,11 +21,69 @@ CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0"
 TOKEN_ADDRESS = "0x3724091348776cC2C1FF205Fd500A4B0787B110D"
 uint256_max = 2**250 - 1
 
+# ----------------------------------------------------------------------
+# Helper functions for GitHub comment posting
+# ----------------------------------------------------------------------
+
+def format_reward_comment(reward_amount, github_account,transaction_hash):
+    """
+    Formats a Markdown comment containing the reward information in a table format.
+    """
+    markdown = "### Reward Information\n\n"
+    markdown += "| Reward Amount | Transaction Hash |\n"
+    markdown += "|---------------|----------------|\n"
+    markdown += f"| {reward_amount} | {transaction_hash} |\n"
+    return markdown
+
+def extract_repo_info(repo_str):
+    """
+    Extracts the repository owner and name from the provided repository string.
+    
+    The repository string can be one of the following forms:
+      - "naizo01/agentic"
+      - "https://github.com/naizo01/agentic"
+      - "omatsuman69/AI-Hackathon-Test-Repo"
+    
+    If "https://github.com/" is not present, it is automatically assumed that the format is "owner/repository".
+    Returns (owner, repository_name).
+    """
+    prefix = "https://github.com/"
+    if repo_str.startswith(prefix):
+        stripped = repo_str[len(prefix):]
+        if "/" in stripped:
+            owner, repo = stripped.split("/", 1)
+            return owner, repo
+        else:
+            raise ValueError("Invalid repository format in URL.")
+    else:
+        if "/" in repo_str:
+            owner, repo = repo_str.split("/", 1)
+            return owner, repo
+        else:
+            raise ValueError("Invalid repository format: missing '/'.")
+
+def post_github_comment(url, data):
+    """
+    Sends a POST request to GitHub's API to post a comment.
+    Requires the environment variable 'GITHUB_TOKEN' to be set.
+    """
+    token = os.environ["GITHUB_TOKEN"]  # KeyError if not set
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github+json"
+    }
+    response = requests.post(url, json=data, headers=headers)
+    response.raise_for_status()  # Raises an exception if the request failed
+    return response.json()
+
+# ----------------------------------------------------------------------
+# Approve token and lock_reward functions
+# ----------------------------------------------------------------------
+
 # Load ABI from JSON file
 def load_abi(file_path: str):
     with open(file_path, 'r') as file:
         return json.load(file)
-
 
 def approve_token(wallet: Wallet, spender: str, value: str, token_address: str) -> str:
     """Approve tokens for spending.
@@ -32,7 +91,7 @@ def approve_token(wallet: Wallet, spender: str, value: str, token_address: str) 
     Args:
         wallet (Wallet): The wallet to use for the transaction.
         spender (str): The address of the spender.
-        value (int): The amount of tokens to approve.
+        value (str): The amount of tokens to approve.
         token_address (str): The address of the token contract.
 
     Returns:
@@ -50,10 +109,10 @@ def approve_token(wallet: Wallet, spender: str, value: str, token_address: str) 
         method=method,
         abi=abi,
         args=approve_args
-        ).wait()
+    ).wait()
     return f"Tokens approved successfully: {result}"
 
-# Define a custom action for invoking the lockReward method.
+# Define a custom action input schema for locking rewards.
 class LockRewardInput(BaseModel):
     """Input argument schema for locking a reward."""
     repositoryName: str = Field(..., description="The name of the GitHub repository.")
@@ -90,7 +149,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
         lock_reward_invocation = wallet.invoke_contract(
             contract_address=CONTRACT_ADDRESS,
             abi=abi,
-            method="lockReward",
+            method=method,
             args=lock_reward_args
         ).wait()
 
@@ -99,6 +158,20 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
             success = add_reward(repositoryName, issueId, reward)
             if success:
                 print(f"Successfully added reward for {repositoryName} issue {issueId}")
+
+                # --- Post GitHub Issue Comment Section (after add_reward) ---
+                try:
+                    # Extract repository owner and name
+                    repo_owner, repo_name = extract_repo_info(repositoryName)
+                    # Use the repository owner as the GitHub account in the comment
+                    comment_body = format_reward_comment(reward, repo_owner)
+                    post_data = {"body": comment_body}
+                    # Construct the URL for posting a comment to the issue
+                    request_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issueId}/comments"
+                    post_github_comment(request_url, post_data)
+                    print(f"Posted comment to issue #{issueId} in {repositoryName}")
+                except Exception as ex:
+                    print(f"Failed to post comment: {str(ex)}")
             else:
                 print(f"Failed to add reward for {repositoryName} issue {issueId}")
 
