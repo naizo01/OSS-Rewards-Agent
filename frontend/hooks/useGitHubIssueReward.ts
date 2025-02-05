@@ -6,8 +6,7 @@ import {
 } from "wagmi";
 import githubIssueRewardABI from "@/lib/abi/githubIssueReward.json";
 
-const CONTRACT_ADDRESS = process.env
-  .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+const CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0" as `0x${string}`;
 
 if (!CONTRACT_ADDRESS) {
   throw new Error("Contract address is not defined");
@@ -35,7 +34,7 @@ export function useGitHubIssueReward() {
     try {
       await write({
         address: CONTRACT_ADDRESS,
-        abi: githubIssueRewardABI.abi,
+        abi: githubIssueRewardABI,
         functionName: "lockReward",
         args: [repositoryName, BigInt(issueId), reward, tokenAddress],
       });
@@ -55,7 +54,7 @@ export function useGitHubIssueReward() {
     try {
       await write({
         address: CONTRACT_ADDRESS,
-        abi: githubIssueRewardABI.abi,
+        abi: githubIssueRewardABI,
         functionName: "registerAndCompleteIssue",
         args: [
           repositoryName,
@@ -75,7 +74,7 @@ export function useGitHubIssueReward() {
     try {
       await write({
         address: CONTRACT_ADDRESS,
-        abi: githubIssueRewardABI.abi,
+        abi: githubIssueRewardABI,
         functionName: "linkGitHubToAddress",
         args: [githubId, address],
       });
@@ -95,7 +94,7 @@ export function useGitHubIssueReward() {
     try {
       await write({
         address: CONTRACT_ADDRESS,
-        abi: githubIssueRewardABI.abi,
+        abi: githubIssueRewardABI,
         functionName: "claimReward",
         args: [repositoryName, BigInt(issueId), githubId, signature],
       });
