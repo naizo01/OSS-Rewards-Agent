@@ -2,17 +2,15 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { Reward } from "@/types/claim";
+import type { Issue } from "@/types/issue";
 
 interface ConnectedViewProps {
-  rewards: Reward[];
-  totalAmount: number;
+  reward: Issue;
   onClaim: () => void;
 }
 
 export function ConnectedView({
-  rewards,
-  totalAmount,
+  reward,
   onClaim,
 }: ConnectedViewProps) {
   return (
@@ -32,25 +30,28 @@ export function ConnectedView({
         </Alert>
       </div>
       <h2 className="text-xl font-semibold mb-4">Available Rewards</h2>
-      <p className="text-gray-600 mb-2">
-        You have the following rewards available to claim:
-      </p>
-      <ul className="list-disc list-inside mb-6 text-gray-600">
-        {rewards.map((reward) => (
-          <li key={reward.issueId}>
-            {reward.issueTitle} (#{reward.issueId}): ${reward.amount}
-          </li>
-        ))}
-      </ul>
-      <p className="text-lg font-semibold mb-6">
-        Total available: ${totalAmount}
-      </p>
-      <Button
-        onClick={onClaim}
-        className="w-full bg-green-600 hover:bg-green-700"
-      >
-        Claim Rewards (${totalAmount})
-      </Button>
+      {reward ? (
+        <>
+          <p className="text-gray-600 mb-2">
+            You have the following rewards available to claim:
+          </p>
+          <ul className="list-disc list-inside mb-6 text-gray-600">
+            <li key={reward.id}>
+              {reward.title} (#{reward.issueId}): ${reward.donations}
+            </li>
+          </ul>
+          <Button
+            onClick={onClaim}
+            className="w-full bg-green-600 hover:bg-green-700"
+          >
+            Claim Rewards
+          </Button>
+        </>
+      ) : (
+        <p className="text-gray-600 mb-6">
+          No rewards available to claim at this time.
+        </p>
+      )}
     </div>
   );
 }

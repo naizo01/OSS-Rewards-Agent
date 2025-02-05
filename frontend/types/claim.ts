@@ -1,3 +1,5 @@
+import type { Issue } from "@/types/issue";
+
 export type ClaimStatus = "initial" | "connected" | "claimed" | "error";
 
 export interface Reward {
@@ -8,7 +10,7 @@ export interface Reward {
 
 export interface ClaimState {
   status: ClaimStatus;
-  rewards: Reward[];
+  reward: Issue | null;
   totalAmount: number;
   errorMessage?: string;
 }

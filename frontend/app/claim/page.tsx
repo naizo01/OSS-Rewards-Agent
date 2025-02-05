@@ -8,20 +8,20 @@ import { ConnectedView } from "@/components/claim/ConnectedView";
 import { ClaimedView } from "@/components/claim/ClaimedView";
 import { AlertCircle } from "lucide-react";
 import type { ClaimState } from "@/types/claim";
-
-const MOCK_REWARDS = [
-  { issueId: 101, issueTitle: "Fix bug in login", amount: 100 },
-  { issueId: 201, issueTitle: "Improve performance", amount: 50 },
-];
+import type { Issue } from "@/types/issue";
+import { issues } from '@/constants/issues';
 
 export default function ClaimPage() {
   const { login, logout, authenticated, user, ready } = usePrivy();
   console.log("user", user);
   const [state, setState] = useState<ClaimState>({
     status: "initial",
-    rewards: [],
+    reward: null,
     totalAmount: 0,
   });
+  const [signature, setSignature] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [targetIssue, setTargetIssue] = useState<Issue | null>(null);
 
   const handleConnectGithub = () => {
     login();
@@ -29,36 +29,42 @@ export default function ClaimPage() {
 
   useEffect(() => {
     if (authenticated) {
-
       const fetchData = async () => {
-        if (authenticated) {
-          const accessToken = await getAccessToken(); // アクセストークンを取得
-  
-          // バックエンドにAPIコール
-          const response = await fetch('/api/verify-token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ message: 'User logged in' }),
-          });
-  
-          const data = await response.json();
-          console.log(data);
-        }
+        const accessToken = await getAccessToken(); // アクセストークンを取得
+
+        // バックエンドにAPIコール
+        const response = await fetch("/api/verify-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ message: "User logged in" }),
+        });
+
+        const data = await response.json();
+        console.log(data);
+        setSignature(data.signature);
+        setUsername(data.username);
       };
-  
+
       fetchData();
 
       setState({
         ...state,
         status: "connected",
-        rewards: MOCK_REWARDS,
+        reward: targetIssue,
         totalAmount: 150,
       });
     }
   }, [authenticated]);
+
+  useEffect(() => {
+    // ここで特定の条件に基づいて対象のissueを探します
+    const issueId = 101; // 例として、特定のissue IDを使用
+    const foundIssue = issues.find(issue => issue.id === issueId);
+    setTargetIssue(foundIssue as Issue);
+  }, []);
 
   const handleClaimRewards = async () => {
     try {
@@ -73,7 +79,7 @@ export default function ClaimPage() {
   };
 
   const handleReset = () => {
-    setState({ status: "initial", rewards: [], totalAmount: 0 });
+    setState({ status: "initial", reward: null, totalAmount: 0 });
   };
 
   return (
@@ -94,8 +100,7 @@ export default function ClaimPage() {
 
           {state.status === "connected" && (
             <ConnectedView
-              rewards={state.rewards}
-              totalAmount={state.totalAmount}
+              reward={state.reward as Issue}
               onClaim={handleClaimRewards}
             />
           )}
