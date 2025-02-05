@@ -15,10 +15,8 @@ export default async function handler(req, res) {
     process.env.NEXT_PUBLIC_PRIVY_APP_ID || "",
     process.env.PRIVY_SECRET_ID || ""
   );
-
   try {
     const verifiedClaims = await privy.verifyAuthToken(authHeader);
-    console.log("verifiedClaims", verifiedClaims);
 
     // const {id, address, chainType} = await privy.walletApi.create({chainType: 'ethereum'});
     // console.log("id", id);
@@ -38,6 +36,8 @@ export default async function handler(req, res) {
         ]
       )
     );
+    console.log("messageHash", messageHash);
+
     const ethSignedMessageHash = keccak256(
       encodePacked(
         ["string", "bytes32"],
@@ -50,6 +50,7 @@ export default async function handler(req, res) {
       message: ethSignedMessageHash,
     });
 
+    console.log("response", response);
     const { signature, encoding } = response;
 
     // トークンが有効な場合の処理
