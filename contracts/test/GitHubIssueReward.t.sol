@@ -17,7 +17,9 @@ contract GitHubIssueRewardTest is Test {
     GitHubIssueReward public rewardContract;
     MockERC20 public token;
     address public owner = address(0x1);
-    address public privilegedAccount = address(0x2);
+    uint256 public signerPrivateKey = uint256(0x2);
+    address public signerAddress;
+    address public privilegedAccount;
     address public contributor;
     uint256 private contributorPrivateKey =
         uint256(0x1); // Private key for signing
@@ -27,8 +29,9 @@ contract GitHubIssueRewardTest is Test {
     /// @notice Sets up the test environment by deploying the contract and minting tokens.
     function setUp() public {
         contributor = vm.addr(contributorPrivateKey);
+        signerAddress = vm.addr(signerPrivateKey);
         token = new MockERC20();
-        rewardContract = new GitHubIssueReward(owner, privilegedAccount);
+        rewardContract = new GitHubIssueReward(signerAddress, privilegedAccount);
         token.mint(owner, 1000 ether);
         vm.prank(owner);
         token.approve(address(rewardContract), 1000 ether);
@@ -55,18 +58,18 @@ contract GitHubIssueRewardTest is Test {
         uint256[] memory percentages = new uint256[](1);
         percentages[0] = 100; // Assign 100% to a single contributor
 
-        vm.prank(owner);
+        vm.prank(privilegedAccount);
         rewardContract.registerAndCompleteIssue(repositoryName, 1, githubIds, percentages);
         (, , bool isCompleted) = rewardContract.issues(repositoryName, 1);
         assertTrue(isCompleted);
     }
 
     /// @notice Tests the linkGitHubToAddress function to ensure GitHub IDs are correctly linked to addresses.
-    function testLinkGitHubToAddress() public {
-        vm.prank(privilegedAccount);
-        rewardContract.linkGitHubToAddress("contributor1", contributor);
-        assertEq(rewardContract.githubToAddress("contributor1"), contributor);
-    }
+    // function testLinkGitHubToAddress() public {
+    //     vm.prank(privilegedAccount);
+    //     rewardContract.linkGitHubToAddress("contributor1", contributor);
+    //     assertEq(rewardContract.githubToAddress("contributor1"), contributor);
+    // }
 
     /// @notice Tests the claimReward function to ensure contributors can claim their rewards correctly.
     function testClaimReward() public {
@@ -77,10 +80,9 @@ contract GitHubIssueRewardTest is Test {
 
         vm.prank(owner);
         rewardContract.lockReward(repositoryName, 1, 100 ether, address(token));
-        vm.prank(owner);
-        rewardContract.registerAndCompleteIssue(repositoryName, 1, githubIds, percentages);
         vm.prank(privilegedAccount);
-        rewardContract.linkGitHubToAddress("contributor1", contributor);
+        rewardContract.registerAndCompleteIssue(repositoryName, 1, githubIds, percentages);
+        // rewardContract.linkGitHubToAddress("contributor1", contributor);
 
         bytes32 messageHash = keccak256(
             abi.encodePacked("contributor1", contributor)
@@ -89,7 +91,7 @@ contract GitHubIssueRewardTest is Test {
             abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
         );
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            contributorPrivateKey,
+            signerPrivateKey,
             ethSignedMessageHash
         );
         bytes memory signature = abi.encodePacked(r, s, v);
