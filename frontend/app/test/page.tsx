@@ -6,7 +6,7 @@ import LockReward from "@/components/test/LockReward";
 import RegisterIssue from "@/components/test/RegisterIssue";
 import LinkGitHub from "@/components/test/LinkGitHub";
 import ClaimReward from "@/components/test/ClaimReward";
-
+import ApproveToken from "@/components/test/ApproveToken";
 export default function TestPage() {
   const [activeTab, setActiveTab] = useState("lock");
 
@@ -15,6 +15,7 @@ export default function TestPage() {
     { id: "register", label: "Register Issue" },
     { id: "link", label: "Link GitHub" },
     { id: "claim", label: "Claim Reward" },
+    { id: "approve", label: "Approve Token" },
   ];
 
   const renderContent = () => {
@@ -27,6 +28,8 @@ export default function TestPage() {
         return <LinkGitHub />;
       case "claim":
         return <ClaimReward />;
+      case "approve":
+        return <ApproveToken />;
       default:
         return null;
     }
