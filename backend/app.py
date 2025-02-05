@@ -4,9 +4,10 @@ from flask_socketio import SocketIO
 from langchain_core.messages import HumanMessage
 import json
 
-# Load the module using absolute import
+# Initialize the AI agent using the chatbot モジュール
 from chatbot import initialize_agent
-from websocket_module import monitor_github_issues
+# reward JSON の各エントリから対象 Issue を監視する start_monitors を利用
+from websocket_module import start_monitors
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Initialize the AI agent globally
 agent_executor, config = initialize_agent()
 
-# Add a root endpoint: When accessing http://localhost:5001 in a browser, it displays 'websocket server'.
+# ルートエンドポイント: ブラウザで http://localhost:5001 にアクセスすると 'websocket server' を表示
 @app.route("/")
 def index():
     return "websocket server"
@@ -24,8 +25,8 @@ def index():
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
     """
-    An endpoint that receives a message from the user and returns the agent's response.
-    Send a POST request with {"message": "user input"} in the request body.
+    ユーザからのメッセージを受信し、AI エージェントのレスポンスを返すエンドポイント
+    リクエストボディに {"message": "ユーザ入力"} を送信する
     """
     data = request.get_json()
     if not data or "message" not in data:
@@ -60,7 +61,8 @@ def api_chat():
 if __name__ == "__main__":
     print("Starting Flask server...")
 
-    monitor_github_issues(socketio, agent_executor, config)
+    # reward JSON の内容に従い、各対象 Issue の監視スレッドを起動する
+    start_monitors(socketio, agent_executor, config)
 
-    # Start the Flask-SocketIO server (host: 0.0.0.0, port: 5001)
-    socketio.run(app, host="0.0.0.0", port=5001, debug=True)
+    # Flask-SocketIO サーバを起動 (ホスト: 0.0.0.0, ポート: 5002)
+    socketio.run(app, host="0.0.0.0", port=5002, debug=True)
