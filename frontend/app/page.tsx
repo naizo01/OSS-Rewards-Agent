@@ -9,58 +9,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const issues = [
-  {
-    id: 101,
-    title: "Fix bug in login",
-    status: "Open",
-    donations: 100,
-    repo: "org/repo-a",
-  },
-  {
-    id: 102,
-    title: "Implement new feature",
-    status: "In Progress",
-    donations: 250,
-    repo: "org/repo-a",
-  },
-  {
-    id: 201,
-    title: "Improve performance",
-    status: "Open",
-    donations: 50,
-    repo: "org/repo-b",
-  },
-  {
-    id: 202,
-    title: "Update documentation",
-    status: "Open",
-    donations: 30,
-    repo: "org/repo-b",
-  },
-  {
-    id: 301,
-    title: "Refactor authentication system",
-    status: "Open",
-    donations: 150,
-    repo: "org/repo-c",
-  },
-  {
-    id: 401,
-    title: "Add dark mode support",
-    status: "Open",
-    donations: 0,
-    repo: "org/repo-d",
-  },
-  {
-    id: 402,
-    title: "Implement CI/CD pipeline",
-    status: "Open",
-    donations: 0,
-    repo: "org/repo-d",
-  },
-];
+import { issues } from "@/constants/issues";
 
 export default function Home() {
   return (
