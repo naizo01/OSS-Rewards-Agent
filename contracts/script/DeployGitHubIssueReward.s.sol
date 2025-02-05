@@ -6,15 +6,15 @@ import "./base/DeployBase.sol";
 
 contract DeployGitHubIssueReward is DeployBase {
     address public privilegedAccount =
-        0xcAF16f8240d7c2Ab1e1975CB83F2839457a294a4;
-    address public ownerAccount = 0xcAF16f8240d7c2Ab1e1975CB83F2839457a294a4;
+        0x5C8C6dC9EBAA6B911B3031b94C522a0073BC81E3;
+    address public signerAddress = 0x1De0Ee4C79f4C022D87347E143DdC3122C5cDDed;
 
     function run() external {
         vm.startBroadcast();
 
         // GitHubIssueRewardコントラクトをデプロイ
         GitHubIssueReward rewardContract = new GitHubIssueReward(
-            ownerAccount,
+            signerAddress,
             privilegedAccount
         );
 
