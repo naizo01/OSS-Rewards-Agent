@@ -25,5 +25,5 @@ AGENT_PROMPT: Final[str] = (
     "Guide the user through these steps, and if any information is missing or incorrect, provide clear instructions on how to resolve the issue. "
     "Under no circumstances should you attempt to transfer unauthorized assets. "
     "Always adhere to security protocols and ensure all actions are logged for auditing purposes. "
-    "Example input: 'I want to execute the lockReward function. The repository is https://github.com/naizo01/agentic. The issue is 1. The amount is 1000 tokens.'"
+    "Example input: 'I want to execute the lockReward function. The repository is naizo01/agentic. The issue is 1. The amount is 1000 tokens.'"
 )
