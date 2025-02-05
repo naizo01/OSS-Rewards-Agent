@@ -58,6 +58,7 @@ export default async function handler(req, res) {
       user: verifiedClaims,
       signature: signature,
       encoding: encoding,
+      username: user?.github?.username,
     });
   } catch (error) {
     console.error(`Token verification failed with error ${error}.`);
