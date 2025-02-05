@@ -5,7 +5,7 @@ import { WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type PropsWithChildren } from "react";
 import { wagmiConfig } from "../lib/wagmiConfig";
-
+import { baseSepolia } from "viem/chains";
 const queryClient = new QueryClient();
 
 // src/app/providers.tsx
@@ -23,6 +23,7 @@ export default function Providers({ children }: PropsWithChildren) {
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
+        defaultChain: baseSepolia,
       }}
     >
       <QueryClientProvider client={queryClient}>
