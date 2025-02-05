@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePrivy, useWallets, getAccessToken } from "@privy-io/react-auth";
+import { usePrivy, getAccessToken } from "@privy-io/react-auth";
 import Header from "@/components/Header";
 import { InitialView } from "@/components/claim/InitialView";
 import { ConnectedView } from "@/components/claim/ConnectedView";
 import { ClaimedView } from "@/components/claim/ClaimedView";
 import { AlertCircle } from "lucide-react";
+import { useGitHubIssueReward } from "@/hooks/useGitHubIssueReward";
 import type { ClaimState } from "@/types/claim";
 import type { Issue } from "@/types/issue";
-import { issues } from '@/constants/issues';
+import { issues } from "@/constants/issues";
 
 export default function ClaimPage() {
   const { login, logout, authenticated, user, ready } = usePrivy();
@@ -20,7 +21,7 @@ export default function ClaimPage() {
     totalAmount: 0,
   });
   const [signature, setSignature] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
   const [targetIssue, setTargetIssue] = useState<Issue | null>(null);
 
   const handleConnectGithub = () => {
@@ -62,24 +63,41 @@ export default function ClaimPage() {
   useEffect(() => {
     // ここで特定の条件に基づいて対象のissueを探します
     const issueId = 101; // 例として、特定のissue IDを使用
-    const foundIssue = issues.find(issue => issue.id === issueId);
+    const foundIssue = issues.find((issue) => issue.id === issueId);
     setTargetIssue(foundIssue as Issue);
   }, []);
 
+  const { claim, isPending, isConfirming, error, transactionHash } =
+    useGitHubIssueReward();
+
   const handleClaimRewards = async () => {
     try {
-      setState({ ...state, status: "claimed" });
+      await claim(
+        targetIssue?.repo as string,
+        parseInt(String(targetIssue?.issueId) as string),
+        username,
+        signature as string
+      );
     } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (isConfirming) {
+      setState({ ...state, status: "claimed" });
+    }
+    if (error) {
       setState({
         ...state,
         status: "error",
         errorMessage: "Failed to claim rewards",
       });
     }
-  };
+  }, [isConfirming, error]);
 
   const handleReset = () => {
-    setState({ status: "initial", reward: null, totalAmount: 0 });
+    setState({ status: "connected", reward: targetIssue, totalAmount: 0 });
   };
 
   return (
@@ -118,6 +136,7 @@ export default function ClaimPage() {
               >
                 Try Again
               </button>
+              <p className="break-words">{error?.message}</p>
             </div>
           )}
         </div>
