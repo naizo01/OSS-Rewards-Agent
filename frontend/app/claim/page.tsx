@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePrivy, useWallets, getAccessToken } from "@privy-io/react-auth";
 import Header from "@/components/Header";
 import { InitialView } from "@/components/claim/InitialView";
 import { ConnectedView } from "@/components/claim/ConnectedView";
@@ -14,28 +15,50 @@ const MOCK_REWARDS = [
 ];
 
 export default function ClaimPage() {
+  const { login, logout, authenticated, user, ready } = usePrivy();
+  console.log("user", user);
   const [state, setState] = useState<ClaimState>({
     status: "initial",
     rewards: [],
     totalAmount: 0,
   });
 
-  const handleConnectGithub = async () => {
-    try {
+  const handleConnectGithub = () => {
+    login();
+  };
+
+  useEffect(() => {
+    if (authenticated) {
+
+      const fetchData = async () => {
+        if (authenticated) {
+          const accessToken = await getAccessToken(); // アクセストークンを取得
+  
+          // バックエンドにAPIコール
+          const response = await fetch('/api/verify-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ message: 'User logged in' }),
+          });
+  
+          const data = await response.json();
+          console.log(data);
+        }
+      };
+  
+      fetchData();
+
       setState({
         ...state,
         status: "connected",
         rewards: MOCK_REWARDS,
         totalAmount: 150,
       });
-    } catch (error) {
-      setState({
-        ...state,
-        status: "error",
-        errorMessage: "Failed to connect to GitHub",
-      });
     }
-  };
+  }, [authenticated]);
 
   const handleClaimRewards = async () => {
     try {
