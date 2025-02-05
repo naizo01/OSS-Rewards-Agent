@@ -87,7 +87,7 @@ CDP_WALLET_SEED=""
 The application exposes a chat endpoint that accepts natural language commands for blockchain interactions:
 
 ```bash
-curl -X POST http://localhost:5000/api/chat \
+curl -X POST http://localhost:5001/api/chat \
   -H "Content-Type: application/json" \
   -d '{"input": "Please tell me the wallet address that the agent will operate.", "conversation_id": 0}'
 ```
@@ -98,12 +98,12 @@ curl -X POST http://localhost:5000/api/chat \
   -d '{"input": "What should I do?", "conversation_id": 0}'
 ```
 ```bash
-curl -X POST http://localhost:5000/api/chat \
+curl -X POST http://localhost:5001/api/chat \
   -H "Content-Type: application/json" \
   -d '{"input": "I want to execute the lockReward function. The repository is https://github.com/naizo01/agentic. The issue is 1. The amount is 1000 tokens.", "conversation_id": 0}'
 ```
 ```bash
-curl -X POST http://localhost:5000/api/chat \
+curl -X POST http://localhost:5001/api/chat \
   -H "Content-Type: application/json" \
   -d '{"input": "Execute the transaction", "conversation_id": 0}'
 ```
@@ -112,7 +112,7 @@ curl -X POST http://localhost:5000/api/chat \
 Retrieve a list of rewards by the agent:
 
 ```bash
-curl http://localhost:5000/rewards 
+curl http://localhost:5001/rewards 
 ```
 
 
