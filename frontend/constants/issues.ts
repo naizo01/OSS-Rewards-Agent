@@ -5,7 +5,7 @@ export const issues = [
     title: "Fix bug in login",
     status: "Open",
     donations: 100,
-    repo: "org/repo-a",
+    repo: "naizo01/OSS-Rewards-Agent",
   },
   {
     id: 102,
