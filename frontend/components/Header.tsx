@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 export default function Header() {
+  const { login, logout, authenticated, user, ready } = usePrivy();
+
   return (
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto h-16 max-w-5xl">
@@ -52,10 +55,11 @@ export default function Header() {
           </div>
           <div className="flex items-center space-x-4">
             <Button
+              onClick={authenticated ? logout : login}
               variant="default"
               className="bg-green-600 hover:bg-green-700"
             >
-              Login
+              {authenticated ? "Logout" : "Login"}
             </Button>
           </div>
         </div>
