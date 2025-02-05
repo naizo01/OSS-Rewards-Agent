@@ -13,6 +13,7 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? ""}
+      clientId={process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID ?? ""}
       config={{
         loginMethods: ["github"], // walletを追加して外部ウォレット接続を有効化
         appearance: {
