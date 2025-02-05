@@ -5,9 +5,9 @@ import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.so
 
 contract GitHubIssueReward {
     address public owner; // The owner of the contract
+    address public signerAddress; // Address used for signing
     address public privilegedAccount; // Account with special privileges
     mapping(string => mapping(uint256 => Issue)) public issues; // Mapping from repository name to issue ID to Issue struct
-    mapping(string => address) public githubToAddress; // Mapping from GitHub ID to Ethereum address
 
     struct Issue {
         uint256 reward; // Total reward amount for the issue
@@ -49,11 +49,24 @@ contract GitHubIssueReward {
         _;
     }
 
-    /// @notice Initializes the contract with the owner and privileged account addresses.
-    /// @param _owner The address of the contract owner.
+    /// @notice Initializes the contract with the signer and privileged account addresses.
+    /// @param _signerAddress The address of the signer account.
     /// @param _privilegedAccount The address of the privileged account.
-    constructor(address _owner, address _privilegedAccount) {
-        owner = _owner;
+    constructor(address _signerAddress, address _privilegedAccount) {
+        owner = msg.sender;
+        signerAddress = _signerAddress;
+        privilegedAccount = _privilegedAccount;
+    }
+
+    /// @notice Sets the signer address. Can only be called by the owner.
+    /// @param _signerAddress The address to be used for signing.
+    function setSignerAddress(address _signerAddress) public onlyOwner {
+        signerAddress = _signerAddress;
+    }
+
+    /// @notice Sets the privileged account address. Can only be called by the owner.
+    /// @param _privilegedAccount The address to be given special privileges.
+    function setPrivilegedAddress(address _privilegedAccount) public onlyOwner {
         privilegedAccount = _privilegedAccount;
     }
 
@@ -88,7 +101,7 @@ contract GitHubIssueReward {
         uint256 issueId,
         string[] memory githubIds,
         uint256[] memory percentages
-    ) public onlyOwner {
+    ) public onlyPrivileged {
         require(
             !issues[repositoryName][issueId].isCompleted,
             "Issue already completed"
@@ -107,17 +120,6 @@ contract GitHubIssueReward {
 
         issues[repositoryName][issueId].isCompleted = true;
         emit IssueCompleted(repositoryName, issueId, githubIds);
-    }
-
-    /// @notice Links a GitHub ID to an Ethereum address.
-    /// @param githubId The GitHub ID to link.
-    /// @param contributorAddress The Ethereum address to link to the GitHub ID.
-    function linkGitHubToAddress(
-        string memory githubId,
-        address contributorAddress
-    ) public onlyPrivileged {
-        githubToAddress[githubId] = contributorAddress;
-        emit GitHubLinked(githubId, contributorAddress);
     }
 
     /// @notice Allows a contributor to claim their reward for a completed issue.
@@ -139,15 +141,11 @@ contract GitHubIssueReward {
             isContributor(repositoryName, issueId, githubId),
             "Not a contributor"
         );
-        require(
-            githubToAddress[githubId] == msg.sender,
-            "Address not linked to GitHub ID"
-        );
 
         // Verify signature
         bytes32 messageHash = keccak256(abi.encodePacked(githubId, msg.sender));
         require(
-            recoverSigner(messageHash, signature) == msg.sender,
+            recoverSigner(messageHash, signature) == signerAddress,
             "Invalid signature"
         );
 
