@@ -1,6 +1,7 @@
 import os
 import constants
 import json
+import re
 import requests
 
 from langchain_openai import ChatOpenAI
@@ -25,13 +26,13 @@ uint256_max = 2**250 - 1
 # Helper functions for GitHub comment posting
 # ----------------------------------------------------------------------
 
-def format_reward_comment(reward_amount, github_account,transaction_hash):
+def format_reward_comment(reward_amount, transaction_hash):
     """
     Formats a Markdown comment containing the reward information in a table format.
     """
     markdown = "### Reward Information\n\n"
     markdown += "| Reward Amount | Transaction Hash |\n"
-    markdown += "|---------------|----------------|\n"
+    markdown += "|---------------|------------------|\n"
     markdown += f"| {reward_amount} | {transaction_hash} |\n"
     return markdown
 
@@ -61,6 +62,17 @@ def extract_repo_info(repo_str):
             return owner, repo
         else:
             raise ValueError("Invalid repository format: missing '/'.")
+
+def extract_transaction_hash(response_text):
+    """
+    Extracts the transaction hash URL from the given response text.
+    Expects a URL starting with "https://sepolia.basescan.org/tx/".
+    """
+    match = re.search(r"(https://sepolia\.basescan\.org/tx/\S+)", response_text)
+    if match:
+        return match.group(1)
+    else:
+        return "Not Available"
 
 def post_github_comment(url, data):
     """
@@ -163,8 +175,10 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
                 try:
                     # Extract repository owner and name
                     repo_owner, repo_name = extract_repo_info(repositoryName)
-                    # Use the repository owner as the GitHub account in the comment
-                    comment_body = format_reward_comment(reward, repo_owner)
+                    # Extract transaction hash URL from the invocation result
+                    tx_url = extract_transaction_hash(str(lock_reward_invocation))
+                    # Format the comment with reward amount and extracted transaction hash URL
+                    comment_body = format_reward_comment(reward, repo_owner, tx_url)
                     post_data = {"body": comment_body}
                     # Construct the URL for posting a comment to the issue
                     request_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issueId}/comments"
