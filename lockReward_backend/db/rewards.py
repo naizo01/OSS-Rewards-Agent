@@ -47,7 +47,7 @@ def get_rewards() -> List[Tuple[str, int, int]]:
     try:
         with sqlite3.connect("agent.db") as con:
             cur = con.cursor()
-            cur.execute("SELECT repository_name, issue_id, reward_amount FROM rewards")
+            cur.execute("SELECT repository_name, issue_id, reward_amount, id FROM rewards")
             results = cur.fetchall()
 
             return results
