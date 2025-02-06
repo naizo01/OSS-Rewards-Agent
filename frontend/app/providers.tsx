@@ -3,6 +3,7 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { type PropsWithChildren } from "react";
 import { wagmiConfig } from "../lib/wagmiConfig";
 import { baseSepolia } from "viem/chains";
@@ -35,7 +36,18 @@ export default function Providers({ children }: PropsWithChildren) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={wagmiConfig}>{children}</WagmiProvider>
+        <WagmiProvider config={wagmiConfig}>
+          <OnchainKitProvider
+            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            chain={baseSepolia}
+            config={{
+              appearance: {
+              },
+            }}
+          >
+            {children}
+          </OnchainKitProvider>
+        </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );

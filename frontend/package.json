@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.36.9",
     "@privy-io/react-auth": "^2.2.1",
     "@privy-io/server-auth": "^1.18.4",
     "@privy-io/wagmi": "^1.0.2",
