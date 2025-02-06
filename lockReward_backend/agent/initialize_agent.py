@@ -40,13 +40,15 @@ def extract_repo_info(repo_str):
     """
     Extracts the repository owner and name from the provided repository string.
     
-    The repository string can be one of the following forms:
+    The repository string should be provided in one of the following forms:
       - "naizo01/agentic"
       - "https://github.com/naizo01/agentic"
-      - "omatsuman69/AI-Hackathon-Test-Repo"
     
-    If "https://github.com/" is not present, it is automatically assumed that the format is "owner/repository".
-    Returns (owner, repository_name).
+    Returns:
+        (owner, repository_name)
+        
+    Raises:
+        ValueError: If the repository string does not include the owner and repository name.
     """
     prefix = "https://github.com/"
     if repo_str.startswith(prefix):
@@ -55,13 +57,13 @@ def extract_repo_info(repo_str):
             owner, repo = stripped.split("/", 1)
             return owner, repo
         else:
-            raise ValueError("Invalid repository format in URL.")
+            raise ValueError("Invalid repository format in URL. Expected format: 'owner/repository'.")
     else:
         if "/" in repo_str:
             owner, repo = repo_str.split("/", 1)
             return owner, repo
         else:
-            raise ValueError("Invalid repository format: missing '/'.")
+            raise ValueError("Invalid repository format: missing '/'. Please provide the repository name in the format 'owner/repository' (e.g. 'naizo01/agentic').")
 
 def extract_transaction_hash(response_text):
     """
@@ -127,7 +129,10 @@ def approve_token(wallet: Wallet, spender: str, value: str, token_address: str) 
 # Define a custom action input schema for locking rewards.
 class LockRewardInput(BaseModel):
     """Input argument schema for locking a reward."""
-    repositoryName: str = Field(..., description="The name of the GitHub repository.")
+    repositoryName: str = Field(
+        ...,
+        description="The full name of the GitHub repository in the format 'owner/repository' (e.g. 'naizo01/agentic')."
+    )
     issueId: int = Field(..., description="The ID of the issue.")
     reward: int = Field(..., description="The amount of reward to lock.")
 
@@ -136,7 +141,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
 
     Args:
         wallet (Wallet): The wallet to use for the transaction.
-        repositoryName (str): The name of the GitHub repository.
+        repositoryName (str): The full name of the GitHub repository in the format 'owner/repository'.
         issueId (int): The ID of the issue.
         reward (int): The amount of reward to lock.
 
@@ -178,7 +183,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
                     # Extract transaction hash URL from the invocation result
                     tx_url = extract_transaction_hash(str(lock_reward_invocation))
                     # Format the comment with reward amount and extracted transaction hash URL
-                    comment_body = format_reward_comment(reward, repo_owner, tx_url)
+                    comment_body = format_reward_comment(reward, tx_url)
                     post_data = {"body": comment_body}
                     # Construct the URL for posting a comment to the issue
                     request_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issueId}/comments"
@@ -233,7 +238,8 @@ def initialize_agent():
     # Define a new tool for locking rewards.
     lockRewardTool = CdpTool(
         name="lock_reward",
-        description="This tool allows the agent to lock rewards in the smart contract.",
+        description="This tool allows the agent to lock rewards in the smart contract. "
+                    "Please provide the repository name in the format 'owner/repository' (e.g. 'naizo01/agentic').",
         cdp_agentkit_wrapper=agentkit,
         args_schema=LockRewardInput,
         func=lock_reward,
