@@ -66,7 +66,7 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
 
       postChat(userInput);
     },
-    [postChat, userInput],
+    [postChat, userInput]
   );
 
   const handleKeyPress = useCallback(
@@ -76,14 +76,14 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
         handleSubmit(e);
       }
     },
-    [handleSubmit],
+    [handleSubmit]
   );
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setUserInput(e.target.value);
     },
-    [setUserInput],
+    [setUserInput]
   );
 
   useEffect(() => {
@@ -106,8 +106,8 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
             </div>
           </div>
         ))}
+        <div className="mt-3" ref={bottomRef} />
       </div>
-      <div className="mt-3" ref={bottomRef} />
 
       <form
         onSubmit={handleSubmit}
