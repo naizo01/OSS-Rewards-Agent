@@ -65,6 +65,10 @@ poetry install
 poetry run python index.py
 ```
 
+```bash
+python db/init_rewards.py
+```
+
 This will start the Python backend server.
 
 ## Agent Wallet

@@ -90,6 +90,17 @@ def post_github_comment(url, data):
     response.raise_for_status()  # Raises an exception if the request failed
     return response.json()
 
+def extract_repo_name(url: str) -> str:
+    """
+    GitHubのリポジトリURLからリポジトリ名を抽出します。
+    例: "https://github.com/naizo01/agentic" -> "naizo01/agentic"
+    """
+    match = re.search(r'github\.com/([^/]+/[^/]+)', url)
+    if match:
+        return match.group(1)
+    else:
+        raise ValueError("有効なGitHubリポジトリURLではありません")
+
 # ----------------------------------------------------------------------
 # Approve token and lock_reward functions
 # ----------------------------------------------------------------------
@@ -148,6 +159,10 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
     Returns:
         str: The result of the contract invocation.
     """
+    # リポジトリ名がURL形式の場合、変換する
+    if repositoryName.startswith("https://github.com/"):
+        repositoryName = extract_repo_name(repositoryName)
+
     # Approve tokens before locking reward
     approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
     print(approve_result)
