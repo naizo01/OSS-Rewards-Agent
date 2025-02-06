@@ -18,7 +18,7 @@ from db.wallet import add_wallet_info, get_wallet_info
 from agent.custom_actions.get_latest_block import get_latest_block
 from db.rewards import add_reward
 
-CONTRACT_ADDRESS = "0x0e1E6A3F1883155CB1C054bBAeA62dcdDCddef19"
+CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0"
 TOKEN_ADDRESS = "0x3724091348776cC2C1FF205Fd500A4B0787B110D"
 uint256_max = 2**250 - 1
 
