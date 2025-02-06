@@ -323,7 +323,7 @@ def evaluate_contribution(
     names = [item["name"] for item in contributer_to_distribution]
     contributions = [str(item["contribution"]) for item in contributer_to_distribution]
     # Execute registerAndCompleteIssue contract method
-    register_and_complete_issue(wallet, repo_name, str(issue_number), names, contributions)
+    register_and_complete_issue(wallet, f"{repo_owner}/{repo_name}", str(issue_number), names, contributions)
 
     # Comment to issue
     post_data = {
