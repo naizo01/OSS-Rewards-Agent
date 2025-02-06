@@ -1,15 +1,12 @@
 "use client";
 import Link from "next/link";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
   ConnectWallet,
   Wallet,
   ConnectWalletText,
   WalletDropdown,
-  WalletDropdownBasename,
-  WalletDropdownFundLink,
+
   WalletDropdownLink,
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
@@ -22,7 +19,6 @@ import {
 } from "@coinbase/onchainkit/identity";
 
 export default function Header() {
-  const { login, logout, authenticated, user, ready } = usePrivy();
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -72,9 +68,9 @@ export default function Header() {
           </div>
           <div className="flex items-center space-x-4">
             <Wallet>
-              <ConnectWallet className="bg-green-600 hover:bg-green-700 ">
+              <ConnectWallet className="bg-gray-400 hover:bg-gray-300 h-11">
                 <ConnectWalletText>Log In</ConnectWalletText>
-                <Avatar className="h-6 w-6" />
+                <Avatar className="h-4 w-4" />
                 <Name />
               </ConnectWallet>
               <WalletDropdown>

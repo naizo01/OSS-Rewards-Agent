@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { Issue } from "@/types/issue";
@@ -9,10 +10,9 @@ interface ConnectedViewProps {
   onClaim: () => void;
 }
 
-export function ConnectedView({
-  reward,
-  onClaim,
-}: ConnectedViewProps) {
+export function ConnectedView({ reward, onClaim }: ConnectedViewProps) {
+  const { login, logout, authenticated, user, ready } = usePrivy();
+
   return (
     <div>
       <div className="text-center mb-6">
@@ -42,7 +42,7 @@ export function ConnectedView({
           </ul>
           <Button
             onClick={onClaim}
-            className="w-full bg-green-600 hover:bg-green-700"
+            className="w-full bg-green-600 hover:bg-green-700 mb-4"
           >
             Claim Rewards
           </Button>
@@ -52,6 +52,14 @@ export function ConnectedView({
           No rewards available to claim at this time.
         </p>
       )}
+      <div className="flex justify-center">
+        <Button
+          onClick={logout}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2"
+        >
+          Logout
+        </Button>
+      </div>
     </div>
   );
 }
