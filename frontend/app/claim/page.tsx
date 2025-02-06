@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePrivy, getAccessToken } from "@privy-io/react-auth";
+import { usePrivy, getAccessToken, useLoginWithOAuth } from "@privy-io/react-auth";
 import Header from "@/components/Header";
 import { InitialView } from "@/components/claim/InitialView";
 import { ConnectedView } from "@/components/claim/ConnectedView";
@@ -13,7 +13,8 @@ import type { Issue } from "@/types/issue";
 import { issues } from "@/constants/issues";
 
 export default function ClaimPage() {
-  const { login, logout, authenticated, user, ready } = usePrivy();
+  const { logout, authenticated, user, ready } = usePrivy();
+  const {initOAuth} = useLoginWithOAuth()
   console.log("user", user);
   const [state, setState] = useState<ClaimState>({
     status: "initial",
@@ -25,7 +26,7 @@ export default function ClaimPage() {
   const [targetIssue, setTargetIssue] = useState<Issue | null>(null);
 
   const handleConnectGithub = () => {
-    login();
+    initOAuth({ provider: 'github' });
   };
 
   useEffect(() => {
