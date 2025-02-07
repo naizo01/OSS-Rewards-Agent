@@ -69,7 +69,7 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <Wallet>
               <ConnectWallet className="bg-gray-400 hover:bg-gray-300 h-11">
-                <ConnectWalletText>Log In</ConnectWalletText>
+                {/* <ConnectWalletText>Log In</ConnectWalletText> */}
                 <Avatar className="h-4 w-4" />
                 <Name />
               </ConnectWallet>
