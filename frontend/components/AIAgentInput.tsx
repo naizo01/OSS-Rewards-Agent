@@ -5,6 +5,7 @@ import type { AgentMessage, StreamEntry } from "../types/types";
 import { generateUUID, markdownToPlainText } from "../lib/utils";
 import SendSvg from "./svg/SendSvg";
 import TimeDisplay from "./TimeDisplay";
+import { Spinner } from "./Spinner";
 
 export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
   const [userInput, setUserInput] = useState("");
@@ -32,7 +33,7 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
     setStreamEntries((prev) => [...prev, streamEntry]);
   }, []);
 
-  const { postChat } = useChat({
+  const { postChat, isLoading } = useChat({
     onSuccess: handleSuccess,
     conversationId,
   });
@@ -100,6 +101,11 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="flex justify-center items-center mt-3">
+            <Spinner />
+          </div>
+        )}
         <div className="mt-3" ref={bottomRef} />
       </div>
 
