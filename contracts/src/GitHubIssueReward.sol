@@ -21,7 +21,8 @@ contract GitHubIssueReward {
         string indexed repositoryName,
         uint256 indexed issueId,
         uint256 reward,
-        address tokenAddress
+        address tokenAddress,
+        address userAddress
     );
     event IssueCompleted(
         string indexed repositoryName,
@@ -70,25 +71,50 @@ contract GitHubIssueReward {
         privilegedAccount = _privilegedAccount;
     }
 
-    /// @notice Locks a reward for a specific issue.
+    /// @notice Locks a reward for a specific issue with user signature verification.
     /// @param repositoryName The name of the repository.
     /// @param issueId The ID of the issue.
     /// @param reward The amount of reward to lock.
     /// @param tokenAddress The address of the token to be used for the reward.
+    /// @param userAddress The address of the user.
+    /// @param signature The signature from the user to verify the transaction.
     function lockReward(
         string memory repositoryName,
         uint256 issueId,
         uint256 reward,
-        address tokenAddress
+        address tokenAddress,
+        address userAddress,
+        bytes memory signature
     ) public {
+        // Verify signature
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(
+                repositoryName,
+                issueId,
+                reward,
+                tokenAddress,
+                userAddress
+            )
+        );
+        require(
+            recoverSigner(messageHash, signature) == userAddress,
+            "Invalid signature"
+        );
+
         IERC20 token = IERC20(tokenAddress);
         require(
-            token.transferFrom(msg.sender, address(this), reward),
+            token.transferFrom(userAddress, address(this), reward),
             "Transfer failed"
         );
         issues[repositoryName][issueId].reward += reward; // Add reward
         issues[repositoryName][issueId].tokenAddress = tokenAddress;
-        emit RewardLocked(repositoryName, issueId, reward, tokenAddress);
+        emit RewardLocked(
+            repositoryName,
+            issueId,
+            reward,
+            tokenAddress,
+            userAddress
+        );
     }
 
     /// @notice Registers contributors and completes an issue.
