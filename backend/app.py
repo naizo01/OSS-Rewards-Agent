@@ -1,4 +1,5 @@
 # backend/app.py
+import os
 from flask import Flask, request, Response
 from flask_socketio import SocketIO
 from langchain_core.messages import HumanMessage
@@ -61,8 +62,9 @@ def api_chat():
 if __name__ == "__main__":
     print("Starting Flask server...")
 
-    # reward JSON の内容に従い、各対象 Issue の監視スレッドを起動する
-    start_monitors(socketio, agent_executor, config)
+    # Flask のデバッグモード（リローダー）では、このブロックが 2 回実行されるため、
+    # 環境変数 "WERKZEUG_RUN_MAIN" が "true" になっているプロセスのみで start_monitors を呼ぶ
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        start_monitors(socketio, agent_executor, config)
 
-    # Flask-SocketIO サーバを起動 (ホスト: 0.0.0.0, ポート: 5002)
     socketio.run(app, host="0.0.0.0", port=5002, debug=True)

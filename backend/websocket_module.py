@@ -81,7 +81,7 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
 # ---------------------------
 def start_monitors(socketio, agent_executor, config):
     """
-    Fetches the JSON from the reward server (http://localhost:5001/reward)
+    Fetches the JSON from the reward server (http://localhost:5001/rewards)
     and starts a monitoring thread for each reward entry based on the repository
     information and issue number.
     """
@@ -124,12 +124,11 @@ def start_monitors(socketio, agent_executor, config):
                 repo = repo_str
 
             # Start a monitoring thread for the target issue of the reward entry
-            t = threading.Thread(
+            thread = threading.Thread(
                 target=monitor_specific_issue,
-                args=(socketio, agent_executor, config, owner, repo, issue_id, reward_value),
-                daemon=True
+                args=(socketio, agent_executor, config, owner, repo, issue_id, reward_value)
             )
-            t.start()
+            thread.start()
             logging.info(f"Started monitoring thread for {owner}/{repo} Issue #{issue_id}")
     except Exception as e:
         logging.error(f"Failed to start monitors: {e}")
