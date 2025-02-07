@@ -146,8 +146,10 @@ class LockRewardInput(BaseModel):
     )
     issueId: int = Field(..., description="The ID of the issue.")
     reward: int = Field(..., description="The amount of reward to lock.")
+    userAddress: str = Field(..., description="The address of the user.")
+    signature: str = Field(..., description="The signature from the user to verify the transaction.")
 
-def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) -> str:
+def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, userAddress: str, signature: str) -> str:
     """Lock a reward in the smart contract.
 
     Args:
@@ -172,8 +174,10 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
     lock_reward_args = {
         "repositoryName": repositoryName,
         "issueId": str(issueId),
-        "reward": str(reward),
-        "tokenAddress": TOKEN_ADDRESS
+        "reward": str(reward * 10**18),
+        "tokenAddress": TOKEN_ADDRESS,
+        "userAddress": userAddress,
+        "signature": signature
     }
 
     try:
