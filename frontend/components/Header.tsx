@@ -4,9 +4,7 @@ import Image from "next/image";
 import {
   ConnectWallet,
   Wallet,
-  ConnectWalletText,
   WalletDropdown,
-
   WalletDropdownLink,
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";

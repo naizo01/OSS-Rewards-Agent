@@ -32,19 +32,13 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
     setStreamEntries((prev) => [...prev, streamEntry]);
   }, []);
 
-  const { postChat, isLoading } = useChat({
+  const { postChat } = useChat({
     onSuccess: handleSuccess,
     conversationId,
   });
 
   useEffect(() => {
-    const initialStreamEntry: StreamEntry = {
-      timestamp: new Date(),
-      type: "user",
-      content: initialMessage,
-    };
-    // setStreamEntries((prev) => [...prev, initialStreamEntry]);
-    postChat(initialMessage);
+    postChat(initialMessage || "");
   }, []);
 
   const handleSubmit = useCallback(

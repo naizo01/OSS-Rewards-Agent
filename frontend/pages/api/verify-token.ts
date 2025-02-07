@@ -1,7 +1,8 @@
 import { PrivyClient } from "@privy-io/server-auth";
 import { encodePacked, keccak256 } from "viem";
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).end(); // メソッドがPOSTでない場合は405エラー
   }

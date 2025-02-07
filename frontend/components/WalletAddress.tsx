@@ -2,7 +2,7 @@
 "use client";
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useAccount, useChainId } from "wagmi";
+import { useChainId } from "wagmi";
 import { useState } from "react";
 
 export default function WalletAddress() {

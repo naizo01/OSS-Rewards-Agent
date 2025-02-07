@@ -11,7 +11,7 @@ interface ConnectedViewProps {
 }
 
 export function ConnectedView({ reward, onClaim }: ConnectedViewProps) {
-  const { login, logout, authenticated, user, ready } = usePrivy();
+  const { logout } = usePrivy();
 
   return (
     <div>

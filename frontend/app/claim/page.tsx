@@ -13,9 +13,8 @@ import type { Issue } from "@/types/issue";
 import { issues } from "@/constants/issues";
 
 export default function ClaimPage() {
-  const { logout, authenticated, user, ready } = usePrivy();
+  const { authenticated } = usePrivy();
   const {initOAuth} = useLoginWithOAuth()
-  console.log("user", user);
   const [state, setState] = useState<ClaimState>({
     status: "initial",
     reward: null,
@@ -68,7 +67,7 @@ export default function ClaimPage() {
     setTargetIssue(foundIssue as Issue);
   }, []);
 
-  const { claim, isPending, isConfirming, error, transactionHash } =
+  const { claim, isConfirming, error } =
     useGitHubIssueReward();
 
   const handleClaimRewards = async () => {

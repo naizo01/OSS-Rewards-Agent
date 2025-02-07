@@ -70,7 +70,7 @@ export default function Home() {
               </div>
               <h3 className="font-medium mb-2">Choose an Issue</h3>
               <p className="text-gray-600">
-                Browse through open issues and find ones you'd like to support
+                Browse through open issues and find ones you&apos;d like to support
                 or work on.
               </p>
             </div>
