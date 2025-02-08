@@ -144,7 +144,7 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
       setStreamEntries((prev) => [...prev, userMessage]);
 
       postChat(input);
-      // setJsonData(null);
+      setJsonData(null);
     },
     [postChat]
   );
