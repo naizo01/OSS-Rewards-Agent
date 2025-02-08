@@ -1,16 +1,18 @@
 # backend/websocket_module.py
 import time
-import requests
 import os
 import logging
 import threading
 from datetime import datetime, timezone
 from urllib.parse import urlparse
-
+import requests
 import settings.logging
 import settings.env  # noqa: F401
 
 from chatbot import process_issue_event
+
+# reward.py 内の get_rewards 関数をインポート
+# from db.rewards import get_rewards
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -77,7 +79,7 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
             time.sleep(POLL_INTERVAL)
 
 # ---------------------------
-# Function to fetch the rewards JSON and start monitoring threads for each reward entry
+# Updated start_monitors: Retrieve rewards directly from the database
 # ---------------------------
 def start_monitors(socketio, agent_executor, config):
     """
@@ -96,12 +98,13 @@ def start_monitors(socketio, agent_executor, config):
         logging.info(f"Number of rewards received: {len(rewards)}")
 
         for reward in rewards:
-            if len(reward) < 2:
+            if len(reward) < 1:
                 logging.error(f"Invalid reward entry (expected at least 2 elements): {reward}")
                 continue
 
             repo_str = reward[0]
             issue_id = reward[1]
+            # Parse the repository information based on its format
             reward_value = reward[2] if len(reward) > 2 else None
 
             owner, repo = None, None
