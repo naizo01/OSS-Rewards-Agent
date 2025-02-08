@@ -26,7 +26,7 @@ export default function useChat({
       setIsLoading(true);
 
       try {
-        const response = await fetch(`${API_URL}/api/chat`, {
+        const response = await fetch(`${API_URL}/api/agent`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

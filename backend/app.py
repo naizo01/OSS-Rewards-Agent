@@ -1,16 +1,31 @@
 # backend/app.py
 import os
-from flask import Flask, request, Response
+from flask import Flask, request, Response, stream_with_context, jsonify
 from flask_socketio import SocketIO
 from langchain_core.messages import HumanMessage
 import json
 
-# Initialize the AI agent using the chatbot モジュール
-from chatbot import initialize_agent
-# reward JSON の各エントリから対象 Issue を監視する start_monitors を利用
+# Initialize the AI agent using the chatbot module
+# from chatbot import initialize_agent
+# Use start_monitors to monitor target issues from each entry in the rewards JSON
 from websocket_module import start_monitors
+from agent.initialize_agent import initialize_agent
+from agent.run_agent import run_agent
+from db.setup import setup
+from db.rewards import get_rewards  # Import the get_rewards function
+from flask_cors import CORS
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
+
+# Allow CORS for http://localhost:3000, http://localhost:3001, and http://localhost:3002 with all methods
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3001"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3002"}})
+
+# Setup SQLite tables
+setup()
 
 # Initialize Flask-SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -18,7 +33,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Initialize the AI agent globally
 agent_executor, config = initialize_agent()
 
-# ルートエンドポイント: ブラウザで http://localhost:5001 にアクセスすると 'websocket server' を表示
+# Root endpoint: When accessing http://localhost:5001 in a browser, "websocket server" is displayed
 @app.route("/")
 def index():
     return "websocket server"
@@ -26,8 +41,8 @@ def index():
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
     """
-    ユーザからのメッセージを受信し、AI エージェントのレスポンスを返すエンドポイント
-    リクエストボディに {"message": "ユーザ入力"} を送信する
+    Endpoint that receives a message from the user and returns the AI agent's response.
+    Send {"message": "user input"} in the request body.
     """
     data = request.get_json()
     if not data or "message" not in data:
@@ -59,12 +74,48 @@ def api_chat():
         mimetype='application/json; charset=utf-8'
     )
 
+# Initialize the agent (again) and attach it to the app
+agent_executor, config = initialize_agent()
+app.agent_executor = agent_executor
+
+# Interact with the agent
+@app.route("/api/agent", methods=['POST'])
+def chat():
+    try:
+        data = request.get_json()
+        # Parse the user input from the request
+        input = data['input']
+        # Use the conversation_id passed in the request for conversation memory
+        config = {"configurable": {"thread_id": data['conversation_id']}}
+        return Response(
+            stream_with_context(run_agent(input, app.agent_executor, config)),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Content-Type': 'text/event-stream',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no'
+            }
+        )
+    except Exception as e:
+        app.logger.error(f"Unexpected error in chat endpoint: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
+
+@app.route("/rewards", methods=['GET'])
+def rewards():
+    try:
+        rewards = get_rewards()
+        return jsonify({'rewards': rewards}), 200
+    except Exception as e:
+        app.logger.error(f"Unexpected error in rewards endpoint: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
+
 if __name__ == "__main__":
     print("Starting Flask server...")
 
-    # Flask のデバッグモード（リローダー）では、このブロックが 2 回実行されるため、
-    # 環境変数 "WERKZEUG_RUN_MAIN" が "true" になっているプロセスのみで start_monitors を呼ぶ
+    # In Flask's debug mode (reloader), this block is executed twice.
+    # Therefore, call start_monitors only in the process where the environment variable "WERKZEUG_RUN_MAIN" is "true".
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         start_monitors(socketio, agent_executor, config)
 
-    socketio.run(app, host="0.0.0.0", port=5002, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5001, debug=True)

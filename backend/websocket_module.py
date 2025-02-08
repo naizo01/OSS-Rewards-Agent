@@ -1,16 +1,18 @@
 # backend/websocket_module.py
 import time
-import requests
 import os
 import logging
 import threading
 from datetime import datetime, timezone
 from urllib.parse import urlparse
-
+import requests
 import settings.logging
 import settings.env  # noqa: F401
 
 from chatbot import process_issue_event
+
+# reward.py 内の get_rewards 関数をインポート
+from db.rewards import get_rewards
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -77,37 +79,33 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
             time.sleep(POLL_INTERVAL)
 
 # ---------------------------
-# Function to fetch the rewards JSON and start monitoring threads for each reward entry
+# Updated start_monitors: Retrieve rewards directly from the database
 # ---------------------------
 def start_monitors(socketio, agent_executor, config):
     """
-    Fetches the JSON from the reward server (http://localhost:5001/rewards)
-    and starts a monitoring thread for each reward entry based on the repository
-    information and issue number.
+    Retrieves rewards directly from the database and starts a monitoring thread
+    for each reward entry based on the repository information and issue number.
     """
-    rewards_url = "http://localhost:5001/rewards"
     try:
-        response = requests.get(rewards_url)
-        if response.status_code != 200:
-            logging.error(f"Error fetching rewards: {response.status_code} - {response.text}")
-            return
-        rewards_json = response.json()
-        rewards = rewards_json.get("rewards", [])
+        # 直接DBからリワード情報を取得
+        rewards = get_rewards()
         logging.info(f"Number of rewards received: {len(rewards)}")
 
         for reward in rewards:
-            if len(reward) < 2:
+            # reward はタプル形式 (repository_name, issue_id, reward_amount, id) を想定
+            if len(reward) < 1:
                 logging.error(f"Invalid reward entry (expected at least 2 elements): {reward}")
                 continue
 
             repo_str = reward[0]
             issue_id = reward[1]
+            # reward_amount を reward_value として扱う（タプル内に ID も含まれているので、インデックス 2 を利用）
             reward_value = reward[2] if len(reward) > 2 else None
 
             owner, repo = None, None
-            # Parse the repository information based on its format
+            # リポジトリ情報のフォーマットに応じて解析
             if repo_str.startswith("https://"):
-                # For URL format, extract the "owner/repository" from the path
+                # URL形式の場合、パスから "owner/repository" を抽出
                 parsed = urlparse(repo_str)
                 path = parsed.path.strip("/")
                 if "/" in path:
@@ -116,14 +114,14 @@ def start_monitors(socketio, agent_executor, config):
                     logging.error(f"Invalid repository format from URL: {repo_str}")
                     continue
             elif "/" in repo_str:
-                # For "owner/repository" format
+                # "owner/repository" 形式の場合
                 owner, repo = repo_str.split("/", 1)
             else:
-                # If only a repository name is provided, use the default owner
+                # 単一のリポジトリ名のみの場合、デフォルトのオーナーを利用
                 owner = GITHUB_OWNER
                 repo = repo_str
 
-            # Start a monitoring thread for the target issue of the reward entry
+            # 各リワードエントリの対象 issue を監視するスレッドを開始
             thread = threading.Thread(
                 target=monitor_specific_issue,
                 args=(socketio, agent_executor, config, owner, repo, issue_id, reward_value)
