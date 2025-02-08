@@ -96,6 +96,8 @@ def setup():
                     issue_id INTEGER NOT NULL,
                     reward_amount INTEGER NOT NULL,
                     is_merged BOOLEAN NOT NULL DEFAULT 0,
+                    issue_title TEXT NOT NULL,
+                    issue_body TEXT,
                     UNIQUE(repository_name, issue_id)
                 )
             """)
@@ -125,6 +127,8 @@ def initialize_rewards_table():
                     issue_id INTEGER NOT NULL,
                     reward_amount INTEGER NOT NULL,
                     is_merged BOOLEAN NOT NULL DEFAULT 0,
+                    issue_title TEXT NOT NULL,
+                    issue_body TEXT,
                     UNIQUE(repository_name, issue_id)
                 )
             """)

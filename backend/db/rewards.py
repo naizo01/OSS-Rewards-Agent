@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def add_reward(repository_name: str, issue_id: int, reward_amount: int) -> bool:
+def add_reward(repository_name: str, issue_id: int, reward_amount: int, issue_title: str, issue_body: str) -> bool:
     """
     Add a reward to the database.
     Returns True if successful, False otherwise.
@@ -16,9 +16,9 @@ def add_reward(repository_name: str, issue_id: int, reward_amount: int) -> bool:
             
             # Try to insert the reward
             cur.execute("""
-                INSERT INTO rewards(repository_name, issue_id, reward_amount)
-                VALUES (?, ?, ?)
-            """, (repository_name, issue_id, reward_amount))
+                INSERT INTO rewards(repository_name, issue_id, reward_amount, is_merged, issue_title, issue_body)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (repository_name, issue_id, reward_amount, 0, issue_title, issue_body))
             con.commit()
             
             # Verify the insertion
@@ -47,7 +47,7 @@ def get_rewards() -> List[Tuple[str, int, int]]:
     try:
         with sqlite3.connect("agent.db") as con:
             cur = con.cursor()
-            cur.execute("SELECT repository_name, issue_id, reward_amount, id, is_merged FROM rewards")
+            cur.execute("SELECT repository_name, issue_id, reward_amount, id, is_merged, issue_title, issue_body FROM rewards")
             results = cur.fetchall()
 
             return results
