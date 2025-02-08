@@ -6,25 +6,37 @@ import { AIAgentInput } from "@/components/AIAgentInput";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/Spinner";
 import { GitGraphIcon as GitIssue, GitPullRequest } from "lucide-react";
-import { issues } from "@/constants/issues";
 import type { Issue } from "@/types/issue";
+import useRewards from "@/hooks/useRewards";
 
 export default function IssuePage({ params }: { params: { id: string } }) {
+  const [rewards, setRewards] = useState<Issue[]>([]);
+
   const [issue, setIssue] = useState<Issue | null>(null);
-
+  const { getRewards } = useRewards({
+    onSuccess: (rewards) => {
+      setRewards(rewards);
+    },
+  });
   useEffect(() => {
-    const fetchIssue = () => {
-      const foundIssue = issues.find((issue) => issue.id === Number(params.id));
-      if (foundIssue) {
-        setIssue(foundIssue);
-      }
-    };
-
-    fetchIssue();
-  }, [params.id]);
+    getRewards();
+  }, []);
+  useEffect(() => {
+    if (rewards.length > 0) {
+      const foundIssue = rewards.find(
+        (issue) => issue.id === Number(params.id)
+      );
+      setIssue(foundIssue as Issue);
+    }
+  }, [rewards, params.id]);
 
   if (!issue) {
-    return Spinner;
+    return (
+      <div className="flex justify-center items-center h-64">
+        {" "}
+        <Spinner />
+      </div>
+    );
   }
 
   const initialMessage = `I will execute the reward lock process. Could you please provide the donation amount in USD? Here is the information we have: repositoryName: https://github.com/${issue.repo}, issueId: ${issue.issueId}.`;
