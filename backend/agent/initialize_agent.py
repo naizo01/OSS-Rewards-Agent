@@ -122,8 +122,11 @@ class LockRewardInput(BaseModel):
     )
     issueId: int = Field(..., description="The ID of the issue")
     reward: int = Field(..., description="The reward amount to lock")
+    userAddress: str = Field(..., description="The address of the user.")
+    signature: str = Field(..., description="The signature from the user to verify the transaction.")
 
-def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) -> str:
+
+def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, userAddress: str, signature: str) -> str:
     """
     Executes the smart contract call to lock a reward.
     """
@@ -135,16 +138,18 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
     uint256_max = 2**250 - 1
     CONTRACT_ADDRESS = os.environ.get("CONTRACT_ADDRESS")
     TOKEN_ADDRESS =  os.environ.get("TOKEN_ADDRESS")
-    approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
-    print(approve_result)
+    # approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
+    # print(approve_result)
 
     abi = load_abi('./agent/contract_abi.json')  # Update the path to the ABI file as needed
     method = "lockReward"
     lock_reward_args = {
         "repositoryName": repositoryName,
         "issueId": str(issueId),
-        "reward": str(reward),
+        "reward": str(reward * 10**18),
         "tokenAddress": TOKEN_ADDRESS
+        # "userAddress": userAddress,
+        # "signature": signature
     }
 
     try:
@@ -154,6 +159,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
             method=method,
             args=lock_reward_args
         ).wait()
+        print(lock_reward_invocation)
 
         if lock_reward_invocation:
             success = add_reward(repositoryName, issueId, reward)
