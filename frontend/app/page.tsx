@@ -3,15 +3,29 @@
 import Header from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import {
   GitGraphIcon as GitIssue,
   GitPullRequest,
   PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { issues } from "@/constants/issues";
+import { Spinner } from "@/components/Spinner";
+import type { Issue } from "@/types/issue";
+import useRewards from "@/hooks/useRewards";
 
 export default function Home() {
+  const [rewards, setRewards] = useState<Issue[]>([]);
+  const { getRewards, isLoading } = useRewards({
+    onSuccess: (rewards) => {
+      setRewards(rewards);
+    },
+  });
+
+  useEffect(() => {
+    getRewards();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -70,8 +84,8 @@ export default function Home() {
               </div>
               <h3 className="font-medium mb-2">Choose an Issue</h3>
               <p className="text-gray-600">
-                Browse through open issues and find ones you&apos;d like to support
-                or work on.
+                Browse through open issues and find ones you&apos;d like to
+                support or work on.
               </p>
             </div>
             <div className="text-center">
@@ -118,59 +132,63 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-          <div className="space-y-4">
-            {issues.map((issue) => (
-              <div
-                key={issue.id}
-                className="border rounded-md p-4 hover:bg-gray-50"
-              >
-                <div className="flex items-start">
-                  <div className="mr-3 mt-1">
-                    {issue.status === "Open" ? (
-                      <GitIssue className="text-green-600" size={20} />
-                    ) : (
-                      <GitPullRequest className="text-purple-600" size={20} />
-                    )}
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-lg font-medium mb-1">
-                      <Link
-                        href={`/issue/${issue.id}`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {issue.title}
-                      </Link>
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {issue.repo} •{" "}
-                      {issue.donations > 0
-                        ? `$${issue.donations} in donations`
-                        : "No donations yet"}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          issue.status === "Open"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-purple-100 text-purple-800"
-                        }`}
-                      >
-                        {issue.status}
-                      </span>
-                      {issue.donations === 0 && (
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <div className="space-y-4">
+              {rewards.map((issue) => (
+                <div
+                  key={issue.id}
+                  className="border rounded-md p-4 hover:bg-gray-50"
+                >
+                  <div className="flex items-start">
+                    <div className="mr-3 mt-1">
+                      {issue.status === "Open" ? (
+                        <GitIssue className="text-green-600" size={20} />
+                      ) : (
+                        <GitPullRequest className="text-purple-600" size={20} />
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-lg font-medium mb-1">
                         <Link
                           href={`/issue/${issue.id}`}
-                          className="text-sm text-green-600 hover:text-green-700 font-medium"
+                          className="text-blue-600 hover:underline"
                         >
-                          Be the first to donate
+                          {issue.title}
                         </Link>
-                      )}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {issue.repo} •{" "}
+                        {issue.donations > 0
+                          ? `$${issue.donations} in donations`
+                          : "No donations yet"}
+                      </p>
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            issue.status === "Open"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-purple-100 text-purple-800"
+                          }`}
+                        >
+                          {issue.status}
+                        </span>
+                        {issue.donations === 0 && (
+                          <Link
+                            href={`/issue/${issue.id}`}
+                            className="text-sm text-green-600 hover:text-green-700 font-medium"
+                          >
+                            Be the first to donate
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>

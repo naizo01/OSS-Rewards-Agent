@@ -8,25 +8,43 @@ logger = logging.getLogger(__name__)
 def add_reward(repository_name: str, issue_id: int, reward_amount: int, issue_title: str, issue_body: str) -> bool:
     """
     Add a reward to the database.
+    If the reward already exists, add the reward_amount to the existing amount.
     Returns True if successful, False otherwise.
     """
     try:
         with sqlite3.connect("agent.db") as con:
             cur = con.cursor()
             
-            # Try to insert the reward
+            # Check if the reward already exists
             cur.execute("""
-                INSERT INTO rewards(repository_name, issue_id, reward_amount, is_merged, issue_title, issue_body)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (repository_name, issue_id, reward_amount, 0, issue_title, issue_body))
+                SELECT reward_amount FROM rewards
+                WHERE repository_name = ? AND issue_id = ?
+            """, (repository_name, issue_id))
+            row = cur.fetchone()
+            
+            if row:
+                # If exists, update the reward_amount
+                new_amount = row[0] + reward_amount
+                cur.execute("""
+                    UPDATE rewards
+                    SET reward_amount = ?
+                    WHERE repository_name = ? AND issue_id = ?
+                """, (new_amount, repository_name, issue_id))
+            else:
+                # If not exists, insert the new reward
+                cur.execute("""
+                    INSERT INTO rewards(repository_name, issue_id, reward_amount)
+                    VALUES (?, ?, ?)
+                """, (repository_name, issue_id, reward_amount))
+            
             con.commit()
             
-            # Verify the insertion
+            # Verify the insertion or update
             if cur.rowcount > 0:
-                logger.info(f"Successfully added reward for {repository_name} issue {issue_id}")
+                logger.info(f"Successfully added or updated reward for {repository_name} issue {issue_id}")
                 return True
             else:
-                logger.warning(f"No rows were inserted for reward: {repository_name} issue {issue_id}")
+                logger.warning(f"No rows were affected for reward: {repository_name} issue {issue_id}")
                 return False
                 
     except sqlite3.IntegrityError as e:

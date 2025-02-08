@@ -1,6 +1,6 @@
 import type { Issue } from "@/types/issue";
 
-export type ClaimStatus = "initial" | "connected" | "claimed" | "error";
+export type ClaimStatus = "initial" | "connected" | "claimed" | "error" | "loading";
 
 export interface Reward {
   issueId: number;

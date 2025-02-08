@@ -15,20 +15,47 @@ import { AlertCircle } from "lucide-react";
 import { useGitHubIssueReward } from "@/hooks/useGitHubIssueReward";
 import type { ClaimState } from "@/types/claim";
 import type { Issue } from "@/types/issue";
-import { issues } from "@/constants/issues";
+import useRewards from "@/hooks/useRewards";
+import { Spinner } from "@/components/Spinner";
 
 export default function ClaimPage() {
-  const { authenticated } = usePrivy();
+  const { authenticated, ready } = usePrivy();
   const { initOAuth } = useLoginWithOAuth();
   const searchParams = useSearchParams();
   const [state, setState] = useState<ClaimState>({
-    status: "initial",
+    status: "loading",
     reward: null,
     totalAmount: 0,
   });
   const [signature, setSignature] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [targetIssue, setTargetIssue] = useState<Issue | null>(null);
+  const [rewards, setRewards] = useState<Issue[]>([]);
+  const [issueId, setIssueId] = useState<number | null>(null);
+  const { getRewards } = useRewards({
+    onSuccess: (rewards) => {
+      setRewards(rewards);
+    },
+  });
+
+  useEffect(() => {
+    getRewards();
+  }, []);
+
+  useEffect(() => {
+    // クエリパラメータからissueIdを取得してステートに保存
+    const queryIssueId = searchParams ? searchParams.get("id") : null;
+    if (queryIssueId) {
+      setIssueId(Number(queryIssueId));
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (rewards.length > 0 && issueId !== null) {
+      const foundIssue = rewards.find((issue) => issue.id === issueId);
+      setTargetIssue(foundIssue as Issue);
+    }
+  }, [rewards, issueId]);
 
   const handleConnectGithub = () => {
     initOAuth({ provider: "github" });
@@ -63,18 +90,7 @@ export default function ClaimPage() {
         totalAmount: 150,
       });
     }
-  }, [authenticated]);
-
-  useEffect(() => {
-    // クエリパラメータからissueIdを取得
-    const queryIssueId = searchParams ? searchParams.get("id") : null;
-    if (queryIssueId) {
-      const foundIssue = issues.find(
-        (issue) => issue.id === Number(queryIssueId)
-      );
-      setTargetIssue(foundIssue as Issue);
-    }
-  }, [searchParams]);
+  }, [authenticated, targetIssue]);
 
   const { claim, isConfirming, error } = useGitHubIssueReward();
 
@@ -120,32 +136,45 @@ export default function ClaimPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          {state.status === "initial" && (
-            <InitialView onConnect={handleConnectGithub} />
-          )}
-
-          {state.status === "connected" && (
-            <ConnectedView
-              reward={state.reward as Issue}
-              onClaim={handleClaimRewards}
-            />
-          )}
-
-          {state.status === "claimed" && (
-            <ClaimedView amount={state.totalAmount} onReset={handleReset} />
-          )}
-
-          {state.status === "error" && (
-            <div className="text-center text-red-600">
-              <p>{state.errorMessage}</p>
-              <button
-                onClick={handleReset}
-                className="mt-4 text-blue-600 hover:underline"
-              >
-                Try Again
-              </button>
-              <p className="break-words">{error?.message}</p>
+          {!ready ? (
+            <div className="flex justify-center items-center h-64">
+              <Spinner />
             </div>
+          ) : (
+            <>
+              {state.status === "loading" && (
+                <div className="flex justify-center items-center h-64">
+                  <Spinner />
+                </div>
+              )}
+              {state.status === "initial" && (
+                <InitialView onConnect={handleConnectGithub} />
+              )}
+
+              {state.status === "connected" && (
+                <ConnectedView
+                  reward={state.reward as Issue}
+                  onClaim={handleClaimRewards}
+                />
+              )}
+
+              {state.status === "claimed" && (
+                <ClaimedView amount={state.totalAmount} onReset={handleReset} />
+              )}
+
+              {state.status === "error" && (
+                <div className="text-center text-red-600">
+                  <p>{state.errorMessage}</p>
+                  <button
+                    onClick={handleReset}
+                    className="mt-4 text-blue-600 hover:underline"
+                  >
+                    Try Again
+                  </button>
+                  <p className="break-words">{error?.message}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
