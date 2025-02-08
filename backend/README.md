@@ -87,3 +87,36 @@ curl -X POST http://localhost:5001/api/chat \
 ```
 {"response": "まず、NFTの発行に必要な情報を教えてください。\n\n1. NFTコレクションの名前（例: \"Helpful Hippos\"）\n2. NFTコレクションのシンボル（例: \"HIPPO\"）\n3. トークンメタデータのベースURI（例: \"https://www.helpfulhippos.xyz/metadata/\"）\n\nこれらの情報を教えていただければ、NFTを発行します。"}%
 ```
+
+## API Usage
+
+The application exposes a chat endpoint that accepts natural language commands for blockchain interactions:
+
+```bash
+curl -X POST http://localhost:5001/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"input": "Please tell me the wallet address that the agent will operate.", "conversation_id": 0}'
+```
+
+```bash
+curl -X POST http://localhost:5000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"input": "What should I do?", "conversation_id": 0}'
+```
+```bash
+curl -X POST http://localhost:5001/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"input": "I want to execute the lockReward function. The repository is https://github.com/naizo01/agentic. The issue is 1. The amount is 1000 tokens.", "conversation_id": 0}'
+```
+```bash
+curl -X POST http://localhost:5001/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"input": "Execute the transaction", "conversation_id": 0}'
+```
+
+
+Retrieve a list of rewards by the agent:
+
+```bash
+curl http://localhost:5001/rewards 
+```
