@@ -9,9 +9,17 @@ import SendSvg from "./svg/SendSvg";
 import TimeDisplay from "./TimeDisplay";
 import { Spinner } from "./Spinner";
 import SignButton from "./SignButton";
+
+interface JsonData {
+  repositoryName: string;
+  issueId: number;
+  reward: number;
+  tokenAddress: string;
+  userAddress: string;
+}
+
 export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
-  const { user, ready, authenticated, login } = usePrivy();
-  console.log(user)
+  const { ready, authenticated, login } = usePrivy();
   const { address } = useAccount();
 
   const [userInput, setUserInput] = useState("");
@@ -24,7 +32,7 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
 
   const [hasPostedInitialMessage, setHasPostedInitialMessage] = useState(false);
 
-  const [jsonData, setJsonData] = useState<any>(null);
+  const [jsonData, setJsonData] = useState<JsonData | null>(null);
 
   // JSONデータを検出して解析する関数
   const extractJsonData = (content: string) => {
@@ -189,7 +197,6 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
         {jsonData && (
           <SignButton
             jsonData={jsonData}
-            setUserInput={setUserInput}
             handleSubmit={(input: string) => handleUserInputSubmit(input)}
           />
         )}

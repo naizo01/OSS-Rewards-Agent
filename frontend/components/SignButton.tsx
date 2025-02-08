@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSignMessage } from "wagmi";
 import { encodePacked, keccak256, parseSignature } from "viem";
 import { TOKEN_ADDRESS } from "../constants/config";
@@ -10,16 +10,14 @@ interface SignButtonProps {
     tokenAddress: string;
     userAddress: string;
   } | null;
-  setUserInput: (input: string) => void;
   handleSubmit: (input: string) => void;
 }
 
 const SignButton: React.FC<SignButtonProps> = ({
   jsonData,
-  setUserInput,
   handleSubmit,
 }) => {
-  const { signMessage, isSuccess, isError, error, data } = useSignMessage({
+  const { signMessage } = useSignMessage({
     mutation: {
       onSuccess(data) {
         console.log("Success", data);
