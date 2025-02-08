@@ -4,42 +4,38 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { AIAgentInput } from "@/components/AIAgentInput";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/Spinner";
 import { GitGraphIcon as GitIssue, GitPullRequest } from "lucide-react";
+import { issues } from "@/constants/issues";
 
 interface Issue {
   id: number;
   title: string;
-  status: "Open" | "In Progress";
+  status: string;
   donations: number;
   repo: string;
-  description: string;
+  issueId: number;
 }
 
 export default function IssuePage({ params }: { params: { id: string } }) {
   const [issue, setIssue] = useState<Issue | null>(null);
 
   useEffect(() => {
-    // Simulating API call to fetch issue details
-    const fetchIssue = async () => {
-      // In a real application, you would fetch the issue data from an API
-      const mockIssue: Issue = {
-        id: Number.parseInt(params.id),
-        title: "Fix bug in login",
-        status: "Open",
-        donations: 100,
-        repo: "org/repo-a",
-        description:
-          "There's a bug in the login process that needs to be fixed.",
-      };
-      setIssue(mockIssue);
+    const fetchIssue = () => {
+      const foundIssue = issues.find((issue) => issue.id === Number(params.id));
+      if (foundIssue) {
+        setIssue(foundIssue);
+      }
     };
 
     fetchIssue();
   }, [params.id]);
 
   if (!issue) {
-    return <div>Loading...</div>;
+    return Spinner;
   }
+
+  const initialMessage = `I will execute the reward lock process. Could you please provide the donation amount in USD? Here is the information we have: repositoryName: https://github.com/${issue.repo}, issueId: ${issue.issueId}.`;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -70,14 +66,16 @@ export default function IssuePage({ params }: { params: { id: string } }) {
               </span>
             </div>
           </div>
-          <p className="text-gray-700 mb-4">{issue.description}</p>
           <Button className="w-full bg-green-600 hover:bg-green-700">
             Contribute to this issue
           </Button>
         </div>
 
-        <h2 className="text-xl font-bold mb-4">Discuss and Donate</h2>
-        <AIAgentInput />
+        <h2 className="text-xl font-bold mb-3">Discuss and Donate</h2>
+        <p className="text-lg mb-3">
+          Interact with the AI agent to donate and execute transactions for open-source project issues.
+        </p>
+        <AIAgentInput initialMessage={initialMessage} />
       </main>
     </div>
   );
