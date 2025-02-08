@@ -134,5 +134,6 @@ if __name__ == "__main__":
             daemon=True  # daemon=True ensures the thread exits when the main program does
         )
         monitor_thread.start()
+    # periodically_start_monitors(socketio, agent_executor, config)
 
     socketio.run(app, host="0.0.0.0", port=5001, debug=True)
