@@ -224,7 +224,7 @@ def initialize_agent():
     elif wallet_id and wallet_seed:
         print("Initialized CDP Agentkit with wallet data from environment:", wallet_id, wallet_seed, flush=True)
         values = {"cdp_wallet_data": json.dumps({"wallet_id": wallet_id, "seed": wallet_seed})}
-    values = {"cdp_wallet_data": json.dumps({"wallet_id": "cf544ebc-81d5-44c2-bbd5-636d487e8677", "seed": "3dda3a402a82b96df94f39ab394e2de3eb84350b50ecad21dbb68ea6a802169f5678f11a262b8cdb115fa0857deb971c0621b67ef2b4b5434cc20504b318a86d", "default_address_id": "0x2D7A675ad140432264E05d07C10E39f513345b4f"})}
+
     agentkit = CdpAgentkitWrapper(**values)
 
     # Export and save wallet information
