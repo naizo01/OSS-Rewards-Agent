@@ -58,3 +58,61 @@ def get_rewards() -> List[Tuple[str, int, int]]:
     except Exception as e:
         logger.error(f"Unexpected error while retrieving rewards: {str(e)}")
         return [] 
+    
+def mark_reward_as_merged(repository_name: str, issue_id: int) -> bool:
+    """
+    Update is_merged to 1 for the specified repository and issue.
+    """
+    try:
+        with sqlite3.connect("agent.db") as con:
+            cur = con.cursor()
+            cur.execute(
+                """
+                UPDATE rewards
+                SET is_merged = 1
+                WHERE repository_name = ? AND issue_id = ?
+                """,
+                (repository_name, issue_id)
+            )
+            con.commit()
+
+            if cur.rowcount > 0:
+                logger.info(f"Marked is_merged=1 for {repository_name} issue {issue_id}")
+                return True
+            else:
+                logger.warning(f"No matching record found for {repository_name} issue {issue_id}")
+                return False
+    except sqlite3.Error as e:
+        logger.error(f"Failed to update is_merged for {repository_name} issue {issue_id}: {str(e)}")
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return False
+
+def get_reward_id(repository_name: str, issue_id: int) -> int | None:
+    """
+    Retrieve the 'id' for the specified repository_name and issue_id.
+    Returns None if not found or in case of error.
+    """
+    try:
+        with sqlite3.connect("agent.db") as con:
+            cur = con.cursor()
+            cur.execute(
+                """
+                SELECT id FROM rewards
+                WHERE repository_name = ? AND issue_id = ?
+                """,
+                (repository_name, issue_id)
+            )
+            row = cur.fetchone()
+            if row:
+                return row[0]
+            else:
+                logger.warning(f"No matching record found for {repository_name} issue {issue_id}")
+                return None
+    except sqlite3.Error as e:
+        logger.error(f"Database error occurred while retrieving id: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return None

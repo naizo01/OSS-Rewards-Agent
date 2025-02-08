@@ -3,6 +3,7 @@ import sys
 import requests
 import os
 from typing import List
+from db.rewards import mark_reward_as_merged, get_reward_id
 from pydantic import BaseModel, Field
 
 from langchain_core.messages import HumanMessage
@@ -330,5 +331,27 @@ def evaluate_contribution(
         "body": f"{format_contribution_report(contributer_to_distribution)}"
     }
     request_post_github_api(f"{GITHUB_API_URL}/repos/{repo_owner}/{repo_name}/issues/{issue_number}/comments", post_data)
+
+    # Update is_merged = 1
+    mark_reward_as_merged(f"{repo_owner}/{repo_name}", issue_number)
+
+    # Retrieve reward ID
+    updated_id = get_reward_id(f"{repo_owner}/{repo_name}", issue_number)
+    logging.info(f"Updated reward ID: {updated_id}")
+
+    # Mention contributors. Only mention contributors who have a positive contribution
+    mention_names = []
+    for item in contributer_to_distribution:
+        if item["contribution"] > 0:
+            mention_names.append(f"@{item['name']}")
+   
+    claim_domain = os.environ.get("CLAIM_DOMAIN", "http://localhost:3000/claim")
+    mention_text = " ".join(mention_names) if mention_names else ""
+    comment_text = f"{mention_text}\nYou can claim from the following URL.\n{claim_domain}?id={updated_id}\n"
+
+    request_post_github_api(
+        f"{GITHUB_API_URL}/repos/{repo_owner}/{repo_name}/issues/{issue_number}/comments",
+        {"body": comment_text}
+    )
 
     return "Contribution evaluation completed successfully."

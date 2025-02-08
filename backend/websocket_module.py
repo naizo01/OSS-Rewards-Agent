@@ -97,6 +97,11 @@ def start_monitors(socketio, agent_executor, config):
                 logging.error(f"Invalid reward entry (expected at least 2 elements): {reward}")
                 continue
 
+            # skip if reward has already been processed
+            if reward[4] == 1:
+                logging.info(f"Reward for issue {reward[1]} has already been processed.")
+                continue
+
             repo_str = reward[0]
             issue_id = reward[1]
             # Parse the repository information based on its format
