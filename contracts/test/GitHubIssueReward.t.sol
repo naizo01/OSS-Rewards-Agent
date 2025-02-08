@@ -24,7 +24,7 @@ contract GitHubIssueRewardTest is Test {
     address public contributor;
     uint256 private contributorPrivateKey = uint256(0x1); // Private key for signing
 
-    string public repositoryName = "example-repo"; // Example repository name
+    string public repositoryName = "example/repo"; // Example repository name
 
     /// @notice Sets up the test environment by deploying the contract and minting tokens.
     function setUp() public {

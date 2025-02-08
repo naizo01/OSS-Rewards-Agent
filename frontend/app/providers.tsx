@@ -20,7 +20,7 @@ export default function Providers({ children }: PropsWithChildren) {
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
-          walletList: ["coinbase_wallet"],
+          walletList: ["coinbase_wallet", "metamask"],
           showWalletLoginFirst: true,
         },
         embeddedWallets: {
