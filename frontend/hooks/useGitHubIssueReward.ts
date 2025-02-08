@@ -5,8 +5,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import githubIssueRewardABI from "@/lib/abi/githubIssueReward.json";
-
-const CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0" as `0x${string}`;
+import { CONTRACT_ADDRESS } from "@/constants/config";
 
 if (!CONTRACT_ADDRESS) {
   throw new Error("Contract address is not defined");
