@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePrivy, getAccessToken, useLoginWithOAuth } from "@privy-io/react-auth";
+import { useSearchParams } from "next/navigation";
+import {
+  usePrivy,
+  getAccessToken,
+  useLoginWithOAuth,
+} from "@privy-io/react-auth";
 import Header from "@/components/Header";
 import { InitialView } from "@/components/claim/InitialView";
 import { ConnectedView } from "@/components/claim/ConnectedView";
@@ -14,7 +19,8 @@ import { issues } from "@/constants/issues";
 
 export default function ClaimPage() {
   const { authenticated } = usePrivy();
-  const {initOAuth} = useLoginWithOAuth()
+  const { initOAuth } = useLoginWithOAuth();
+  const searchParams = useSearchParams();
   const [state, setState] = useState<ClaimState>({
     status: "initial",
     reward: null,
@@ -25,15 +31,14 @@ export default function ClaimPage() {
   const [targetIssue, setTargetIssue] = useState<Issue | null>(null);
 
   const handleConnectGithub = () => {
-    initOAuth({ provider: 'github' });
+    initOAuth({ provider: "github" });
   };
 
   useEffect(() => {
     if (authenticated) {
       const fetchData = async () => {
-        const accessToken = await getAccessToken(); // アクセストークンを取得
+        const accessToken = await getAccessToken();
 
-        // バックエンドにAPIコール
         const response = await fetch("/api/verify-token", {
           method: "POST",
           headers: {
@@ -61,14 +66,17 @@ export default function ClaimPage() {
   }, [authenticated]);
 
   useEffect(() => {
-    // ここで特定の条件に基づいて対象のissueを探します
-    const issueId = 101; // 例として、特定のissue IDを使用
-    const foundIssue = issues.find((issue) => issue.id === issueId);
-    setTargetIssue(foundIssue as Issue);
-  }, []);
+    // クエリパラメータからissueIdを取得
+    const queryIssueId = searchParams ? searchParams.get("id") : null;
+    if (queryIssueId) {
+      const foundIssue = issues.find(
+        (issue) => issue.id === Number(queryIssueId)
+      );
+      setTargetIssue(foundIssue as Issue);
+    }
+  }, [searchParams]);
 
-  const { claim, isConfirming, error } =
-    useGitHubIssueReward();
+  const { claim, isConfirming, error } = useGitHubIssueReward();
 
   const handleClaimRewards = async () => {
     try {
