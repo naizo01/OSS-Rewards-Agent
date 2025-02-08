@@ -33,9 +33,9 @@ def add_reward(repository_name: str, issue_id: int, reward_amount: int, issue_ti
             else:
                 # If not exists, insert the new reward
                 cur.execute("""
-                    INSERT INTO rewards(repository_name, issue_id, reward_amount)
-                    VALUES (?, ?, ?)
-                """, (repository_name, issue_id, reward_amount))
+                    INSERT INTO rewards(repository_name, issue_id, reward_amount, is_merged, issue_title, issue_body)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (repository_name, issue_id, reward_amount, 0, issue_title, issue_body))
             
             con.commit()
             
