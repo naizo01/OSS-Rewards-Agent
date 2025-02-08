@@ -7,15 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/Spinner";
 import { GitGraphIcon as GitIssue, GitPullRequest } from "lucide-react";
 import { issues } from "@/constants/issues";
-
-interface Issue {
-  id: number;
-  title: string;
-  status: string;
-  donations: number;
-  repo: string;
-  issueId: number;
-}
+import type { Issue } from "@/types/issue";
 
 export default function IssuePage({ params }: { params: { id: string } }) {
   const [issue, setIssue] = useState<Issue | null>(null);
@@ -73,7 +65,8 @@ export default function IssuePage({ params }: { params: { id: string } }) {
 
         <h2 className="text-xl font-bold mb-3">Discuss and Donate</h2>
         <p className="text-lg mb-3">
-          Interact with the AI agent to donate and execute transactions for open-source project issues.
+          Interact with the AI agent to donate and execute transactions for
+          open-source project issues.
         </p>
         <AIAgentInput initialMessage={initialMessage} />
       </main>
