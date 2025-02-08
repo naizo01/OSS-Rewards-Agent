@@ -133,8 +133,8 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int) 
 
     # Pre-approve tokens
     uint256_max = 2**250 - 1
-    CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0"
-    TOKEN_ADDRESS = "0x3724091348776cC2C1FF205Fd500A4B0787B110D"
+    CONTRACT_ADDRESS = os.environ.get("CONTRACT_ADDRESS")
+    TOKEN_ADDRESS =  os.environ.get("TOKEN_ADDRESS")
     approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
     print(approve_result)
 
