@@ -99,7 +99,7 @@ def start_monitors(socketio, agent_executor, config):
 
             repo_str = reward[0]
             issue_id = reward[1]
-            # reward_amount を reward_value として扱う（タプル内に ID も含まれているので、インデックス 2 を利用）
+            # Parse the repository information based on its format
             reward_value = reward[2] if len(reward) > 2 else None
 
             owner, repo = None, None
