@@ -3,9 +3,9 @@
 import Header from "@/components/Header";
 import { AIAgentInput } from "@/components/AIAgentInput";
 
-const initialMessage =
-  "I will execute the reward lock process. Please provide the following information in sequence: the repository name, the issue ID, and the amount. Let's start with the repository name. Could you please provide it?";
 export default function AddIssuePage() {
+  const initialMessage = `I will execute the reward lock process. Please provide the following information in sequence: the repository name, the issue ID, and the amount. Let's start with the repository name. Could you please provide it?`;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

@@ -1,21 +1,31 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useChat from "../hooks/useChat";
+import { usePrivy } from "@privy-io/react-auth";
+import { useAccount } from "wagmi";
 import type { AgentMessage, StreamEntry } from "../types/types";
 import { generateUUID, markdownToPlainText } from "../lib/utils";
 import SendSvg from "./svg/SendSvg";
 import TimeDisplay from "./TimeDisplay";
 import { Spinner } from "./Spinner";
 
-export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
+export function AIAgentInput({
+  initialMessage,
+}: {
+  initialMessage?: string;
+}) {
+  const { ready, authenticated, login } = usePrivy();
+  const { address } = useAccount();
+
   const [userInput, setUserInput] = useState("");
   const [streamEntries, setStreamEntries] = useState<StreamEntry[]>([]);
-
   const conversationId = useMemo(() => {
     return generateUUID();
   }, []);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const [hasPostedInitialMessage, setHasPostedInitialMessage] = useState(false);
 
   const handleSuccess = useCallback((messages: AgentMessage[]) => {
     let message = messages.find((res) => res.event === "agent");
@@ -39,8 +49,18 @@ export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
   });
 
   useEffect(() => {
-    postChat(initialMessage || "");
-  }, []);
+    if (!authenticated && ready) {
+      login();
+    }
+  }, [ready, authenticated]);
+
+  useEffect(() => {
+    if (authenticated && address && !hasPostedInitialMessage) {
+      const message = initialMessage + `my Ethereum address  is: ${address}`
+      postChat(message || "");
+      setHasPostedInitialMessage(true);
+    }
+  }, [authenticated, initialMessage, address, postChat, hasPostedInitialMessage]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
