@@ -34,50 +34,50 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
     logging.info(f"Starting monitoring for issue #{issue_number} in {owner}/{repo}")
     processed = False
 
-    while not processed:
-        try:
-            # Access the API endpoint for the specified issue
-            url = f'https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}'
-            response = requests.get(url)
-            logging.info(f"Fetching issue #{issue_number} from {owner}/{repo} - status: {response.status_code}")
-            
-            if response.status_code != 200:
-                logging.error(f"GitHub API error for {owner}/{repo} Issue #{issue_number}: {response.status_code} - {response.text}")
-                time.sleep(POLL_INTERVAL)
-                continue
-
-            issue = response.json()
-            closed_at = issue.get('closed_at')
-            if closed_at is None:
-                logging.info(f"Issue #{issue_number} in {owner}/{repo} is not closed yet. Waiting {POLL_INTERVAL} seconds...")
-                time.sleep(POLL_INTERVAL)
-                continue
-
-            # Once the issue is closed, process it only once
-            logging.info(f"Issue #{issue_number} in {owner}/{repo} has been closed at {closed_at}. Processing event...")
-            issue_info = {
-                'owner': owner,
-                'repository': repo,
-                'number': issue_number,
-                'title': issue.get('title', ''),
-                'user': issue.get('user', {}).get('login', ''),
-                'closed_at': closed_at,
-                'body': issue.get('body', ''),
-                # Additional information such as reward_value can also be added
-                'reward_value': reward_value,
-            }
-            print(issue_info)
-            agent_response = process_issue_event(issue_info, agent_executor, config)
-            socketio.emit('issue_processed', {
-                'issue_info': issue_info,
-                'agent_response': agent_response
-            })
-            processed = True
-            logging.info(f"Finished processing issue #{issue_number} in {owner}/{repo}. Exiting monitoring thread.")
-        except Exception as e:
-            logging.error(f"An error occurred while monitoring {owner}/{repo} Issue #{issue_number}: {e}")
+    # while not processed:
+    try:
+        # Access the API endpoint for the specified issue
+        url = f'https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}'
+        response = requests.get(url)
+        logging.info(f"Fetching issue #{issue_number} from {owner}/{repo} - status: {response.status_code}")
+        
+        if response.status_code != 200:
+            logging.error(f"GitHub API error for {owner}/{repo} Issue #{issue_number}: {response.status_code} - {response.text}")
             time.sleep(POLL_INTERVAL)
+            # continue
 
+        issue = response.json()
+        closed_at = issue.get('closed_at')
+        if closed_at is None:
+            logging.info(f"Issue #{issue_number} in {owner}/{repo} is not closed yet. Waiting {POLL_INTERVAL} seconds...")
+            time.sleep(POLL_INTERVAL)
+            # continue
+
+        # Once the issue is closed, process it only once
+        logging.info(f"Issue #{issue_number} in {owner}/{repo} has been closed at {closed_at}. Processing event...")
+        issue_info = {
+            'owner': owner,
+            'repository': repo,
+            'number': issue_number,
+            'title': issue.get('title', ''),
+            'user': issue.get('user', {}).get('login', ''),
+            'closed_at': closed_at,
+            'body': issue.get('body', ''),
+            # Additional information such as reward_value can also be added
+            'reward_value': reward_value,
+        }
+        print(issue_info)
+        agent_response = process_issue_event(issue_info, agent_executor, config)
+        socketio.emit('issue_processed', {
+            'issue_info': issue_info,
+            'agent_response': agent_response
+        })
+        # processed = True
+        logging.info(f"Finished processing issue #{issue_number} in {owner}/{repo}. Exiting monitoring thread.")
+    except Exception as e:
+        logging.error(f"An error occurred while monitoring {owner}/{repo} Issue #{issue_number}: {e}")
+        time.sleep(POLL_INTERVAL)
+    
 # ---------------------------
 # Updated start_monitors: Retrieve rewards directly from the database
 # ---------------------------
@@ -95,6 +95,11 @@ def start_monitors(socketio, agent_executor, config):
             # reward はタプル形式 (repository_name, issue_id, reward_amount, id) を想定
             if len(reward) < 1:
                 logging.error(f"Invalid reward entry (expected at least 2 elements): {reward}")
+                continue
+
+            # skip if reward has already been processed
+            if reward[4] == 1:
+                logging.info(f"Reward for issue {reward[1]} has already been processed.")
                 continue
 
             repo_str = reward[0]
@@ -122,11 +127,12 @@ def start_monitors(socketio, agent_executor, config):
                 repo = repo_str
 
             # 各リワードエントリの対象 issue を監視するスレッドを開始
-            thread = threading.Thread(
-                target=monitor_specific_issue,
-                args=(socketio, agent_executor, config, owner, repo, issue_id, reward_value)
-            )
-            thread.start()
+            # thread = threading.Thread(
+            #     target=monitor_specific_issue,
+            #     args=(socketio, agent_executor, config, owner, repo, issue_id, reward_value)
+            # )
+            # thread.start()
+            monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_id, reward_value)
             logging.info(f"Started monitoring thread for {owner}/{repo} Issue #{issue_id}")
     except Exception as e:
         logging.error(f"Failed to start monitors: {e}")

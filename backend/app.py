@@ -1,4 +1,5 @@
 # backend/app.py
+import time
 import os
 from flask import Flask, request, Response, stream_with_context, jsonify
 from flask_socketio import SocketIO
@@ -110,12 +111,29 @@ def rewards():
         app.logger.error(f"Unexpected error in rewards endpoint: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
+POLL_INTERVAL = int(os.environ.get('POLL_INTERVAL', '30'))
+def periodically_start_monitors(socketio, agent_executor, config, check_interval=300):
+    """
+    Periodically retrieves rewards and starts monitoring threads if new rewards are found.
+    check_interval is the time in seconds between each check.
+    """
+    while True:
+        start_monitors(socketio, agent_executor, config)
+        time.sleep(POLL_INTERVAL)
+
 if __name__ == "__main__":
     print("Starting Flask server...")
 
     # In Flask's debug mode (reloader), this block is executed twice.
     # Therefore, call start_monitors only in the process where the environment variable "WERKZEUG_RUN_MAIN" is "true".
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        start_monitors(socketio, agent_executor, config)
+        import threading
+        monitor_thread = threading.Thread(
+            target=periodically_start_monitors,
+            args=(socketio, agent_executor, config),
+            daemon=True  # daemon=True ensures the thread exits when the main program does
+        )
+        monitor_thread.start()
+    # periodically_start_monitors(socketio, agent_executor, config)
 
     socketio.run(app, host="0.0.0.0", port=5001, debug=True)
