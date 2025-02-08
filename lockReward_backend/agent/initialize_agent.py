@@ -18,7 +18,7 @@ from db.wallet import add_wallet_info, get_wallet_info
 from agent.custom_actions.get_latest_block import get_latest_block
 from db.rewards import add_reward
 
-CONTRACT_ADDRESS = "0xd7bc036902663b801a90aFf0511E2D2553f996d0"
+CONTRACT_ADDRESS = "0x39d449b6f2634B464704Cb079578131dfD5BE3c6"
 TOKEN_ADDRESS = "0x3724091348776cC2C1FF205Fd500A4B0787B110D"
 uint256_max = 2**250 - 1
 
@@ -166,8 +166,8 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
         repositoryName = extract_repo_name(repositoryName)
 
     # Approve tokens before locking reward
-    approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
-    print(approve_result)
+    # approve_result = approve_token(wallet, CONTRACT_ADDRESS, str(uint256_max), TOKEN_ADDRESS)
+    # print(approve_result)
 
     abi = load_abi('./agent/contract_abi.json')  # Update the path as needed
     method = "lockReward"
@@ -188,6 +188,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
             method=method,
             args=lock_reward_args
         ).wait()
+        print(lock_reward_invocation)
 
         # If the invocation is successful, add the reward to the database
         if lock_reward_invocation:

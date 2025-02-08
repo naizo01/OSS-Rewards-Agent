@@ -1,1 +1,2 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+export const TOKEN_ADDRESS = "0x3724091348776cC2C1FF205Fd500A4B0787B110D";

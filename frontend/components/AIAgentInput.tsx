@@ -8,13 +8,10 @@ import { generateUUID, markdownToPlainText } from "../lib/utils";
 import SendSvg from "./svg/SendSvg";
 import TimeDisplay from "./TimeDisplay";
 import { Spinner } from "./Spinner";
-
-export function AIAgentInput({
-  initialMessage,
-}: {
-  initialMessage?: string;
-}) {
-  const { ready, authenticated, login } = usePrivy();
+import SignButton from "./SignButton";
+export function AIAgentInput({ initialMessage }: { initialMessage?: string }) {
+  const { user, ready, authenticated, login } = usePrivy();
+  console.log(user)
   const { address } = useAccount();
 
   const [userInput, setUserInput] = useState("");
@@ -27,6 +24,30 @@ export function AIAgentInput({
 
   const [hasPostedInitialMessage, setHasPostedInitialMessage] = useState(false);
 
+  const [jsonData, setJsonData] = useState<any>(null);
+
+  // JSONデータを検出して解析する関数
+  const extractJsonData = (content: string) => {
+    // 改行を削除し、複数の空白を1つのスペースに変換
+    const sanitizedContent = content.replace(/\n/g, "").replace(/\s+/g, " ");
+    const jsonStartIndex = sanitizedContent.indexOf('{ "repositoryName":');
+    if (jsonStartIndex !== -1) {
+      try {
+        // JSONデータを抽出
+        const jsonString = sanitizedContent.substring(jsonStartIndex).trim();
+        const jsonEndIndex = jsonString.lastIndexOf("}");
+        if (jsonEndIndex !== -1) {
+          const completeJsonString = jsonString.substring(0, jsonEndIndex + 1);
+          console.log("Extracted JSON String:", completeJsonString);
+          return JSON.parse(completeJsonString);
+        }
+      } catch (error) {
+        console.error("Invalid JSON format:", error);
+      }
+    }
+    return null;
+  };
+
   const handleSuccess = useCallback((messages: AgentMessage[]) => {
     let message = messages.find((res) => res.event === "agent");
     if (!message) {
@@ -35,9 +56,17 @@ export function AIAgentInput({
     if (!message) {
       message = messages.find((res) => res.event === "error");
     }
+
+    const content = markdownToPlainText(message?.data || "");
+    // JSONデータの検出とステートへの保存
+    const parsedJson = extractJsonData(content || "");
+    if (parsedJson) {
+      setJsonData(parsedJson);
+    }
+
     const streamEntry: StreamEntry = {
       timestamp: new Date(),
-      content: markdownToPlainText(message?.data || ""),
+      content: content,
       type: "agent",
     };
     setStreamEntries((prev) => [...prev, streamEntry]);
@@ -48,6 +77,14 @@ export function AIAgentInput({
     conversationId,
   });
 
+  //   useEffect(() => {
+  //     const jsonData = extractJsonData(`AI: Thank you for providing all the necessary information. Here's a summary of the data collected: - Repository Name: kmtr/forge-runjson-utils - Issue ID: 1 - Amount: 10 USD - User Address: 0x694415AF0316dD976993B3cfB79cE1991853139d Now, I will prepare the data in JSON format for you to sign. The token address is predefined, and I will include it in the JSON. Here's the JSON data: json { "repositoryName": "kmtr/forge-runjson-utils", "issueId": 1, "reward": 10, "tokenAddress": "0xYourTokenAddressHere", "userAddress": "0x694415AF0316dD976993B3cfB79cE1991853139d" } Please replace "0xYourTokenAddressHere" with the actual token address before signing. Once you have prepared to sign the JSON data, please let me know, and I will proceed with the transaction.
+  // `);
+  //     setJsonData(jsonData);
+
+  //     console.log("jsonData", jsonData);
+  //   }, []);
+
   useEffect(() => {
     if (!authenticated && ready) {
       login();
@@ -56,11 +93,17 @@ export function AIAgentInput({
 
   useEffect(() => {
     if (authenticated && address && !hasPostedInitialMessage) {
-      const message = initialMessage + `my Ethereum address  is: ${address}`
+      const message = initialMessage + `my Ethereum address  is: ${address}`;
       postChat(message || "");
       setHasPostedInitialMessage(true);
     }
-  }, [authenticated, initialMessage, address, postChat, hasPostedInitialMessage]);
+  }, [
+    authenticated,
+    initialMessage,
+    address,
+    postChat,
+    hasPostedInitialMessage,
+  ]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -82,6 +125,28 @@ export function AIAgentInput({
       postChat(userInput);
     },
     [postChat, userInput]
+  );
+
+  const handleUserInputSubmit = useCallback(
+    async (input: string) => {
+      if (!input.trim()) {
+        return;
+      }
+
+      setUserInput("");
+
+      const userMessage: StreamEntry = {
+        timestamp: new Date(),
+        type: "user",
+        content: input.trim(),
+      };
+
+      setStreamEntries((prev) => [...prev, userMessage]);
+
+      postChat(input);
+      // setJsonData(null);
+    },
+    [postChat]
   );
 
   const handleKeyPress = useCallback(
@@ -121,6 +186,13 @@ export function AIAgentInput({
             </div>
           </div>
         ))}
+        {jsonData && (
+          <SignButton
+            jsonData={jsonData}
+            setUserInput={setUserInput}
+            handleSubmit={(input: string) => handleUserInputSubmit(input)}
+          />
+        )}
         {isLoading && (
           <div className="flex justify-center items-center mt-3">
             <Spinner />
