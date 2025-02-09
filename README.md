@@ -25,6 +25,10 @@ OSS-Rewards-Agent is a groundbreaking open source support project that matches c
 
 ![](./public/system.png)
 
+## Contract Addresses
+
+- **Base Sepolia**: `0xd7bc036902663b801a90aFf0511E2D2553f996d0`
+- **Arbitrum Sepolia**: `0x68F5333416fFF0Dce00e9a10384fD54A6986cAe1`
 
 ## Security Features
 
@@ -32,7 +36,6 @@ The system ensures secure reward distribution through:
 - GitHub account authentication requirement
 - Verification that only the contributor whose pull request was merged can claim the reward
 - Automated validation of contribution completion
-
 
 ## Directory
 ```
