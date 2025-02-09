@@ -34,7 +34,7 @@ The system ensures secure reward distribution through:
 - Automated validation of contribution completion
 
 
-# Directory
+## Directory
 ```
 .
 ├── backend        # Implementation related to donor agent, donation agent, and GitHub monitoring
