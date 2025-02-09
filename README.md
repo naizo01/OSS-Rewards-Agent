@@ -23,7 +23,7 @@ OSS-Rewards-Agent is a groundbreaking open source support project that matches c
 
 ## System Architecture
 
-![](./public/architecture.png)
+![](./public/system.png)
 
 
 ## Security Features
