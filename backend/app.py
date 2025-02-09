@@ -137,4 +137,4 @@ if __name__ == "__main__":
         monitor_thread.start()
     # periodically_start_monitors(socketio, agent_executor, config)
 
-    socketio.run(app, host="0.0.0.0", port=5001, debug=True)
+    socketio.run(app, host="0.0.0.0", port=os.environ.get('PORT', '5001'), debug=True)
