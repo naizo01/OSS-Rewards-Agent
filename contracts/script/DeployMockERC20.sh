@@ -17,3 +17,5 @@ forge script script/DeployMockERC20.s.sol:DeployMockERC20 \
   --etherscan-api-key $SCAN_API_KEY \
   -vvvv
   # --priority-gas-price 100000000 \ 
+
+  # sh script/DeployMockERC20.sh
