@@ -50,6 +50,12 @@ export default function ClaimPage() {
     }
   }, [searchParams]);
 
+  useEffect(()=>{
+    if(!authenticated){
+      setState({ ...state, status: "initial" })
+    }
+  }, [authenticated]);
+
   useEffect(() => {
     if (rewards.length > 0 && issueId !== null) {
       const foundIssue = rewards.find((issue) => issue.id === issueId);
