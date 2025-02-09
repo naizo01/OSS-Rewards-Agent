@@ -17,7 +17,7 @@ export function ConnectedView({ reward, onClaim }: ConnectedViewProps) {
     <div>
       <div className="text-center mb-6">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6-Fz2g4cbqaXbpgRracqssijMsZ31FZB.png"
+          src="/image/6.png"
           alt="Connected"
           width={100}
           height={100}
