@@ -38,7 +38,7 @@ The system ensures secure reward distribution through:
 ```
 .
 ├── backend        # Implementation related to donor agent, donation agent, and GitHub monitoring
-├── contracts      # Implementation of lock_reward
+├── contracts      # Implementation of lock_reward and claimReward
 ├── frontend       # Frontend implementation
 ├── public         # Documentation and resources
 ├── README.md      # Overview of this project
