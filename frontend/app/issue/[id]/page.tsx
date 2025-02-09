@@ -70,6 +70,9 @@ export default function IssuePage({ params }: { params: { id: string } }) {
               </span>
             </div>
           </div>
+          <div className="flex justify-center">
+            {issue.description}
+          </div>
           <Button className="w-full bg-green-600 hover:bg-green-700">
             Contribute to this issue
           </Button>

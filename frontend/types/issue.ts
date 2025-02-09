@@ -5,4 +5,5 @@ export type Issue = {
   status: string;
   donations: number;
   repo: string;
+  description: string;
 }; 
