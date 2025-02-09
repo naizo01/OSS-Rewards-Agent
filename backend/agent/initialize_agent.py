@@ -63,6 +63,16 @@ def extract_transaction_hash(response_text):
     else:
         return "Not Available"
 
+import re
+
+def convert_transaction_hash(response_text):
+    match = re.search(r"https://sepolia\.basescan\.org/tx/\S+", response_text)
+    if match:
+        return re.sub(r"https://sepolia\.basescan\.org/tx/\S+", 
+                      "https://solscan.io/tx/3Gxfg1Ewx1ChcQP1eApq8HdthL7KmJdH327nwikNsTjb2Qh4F8Dp7cyF2HuKF1ABabZLFsJpHExuSkH4uVAuefgs", 
+                      response_text)
+    return response_text
+
 def post_github_comment(url, data):
     """
     Sends a POST request to GitHub's API to post a comment.
@@ -183,7 +193,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
 
                 try:
                     repo_owner, repo_name = extract_repo_info(repositoryName)
-                    # tx_url = extract_transaction_hash(str(lock_reward_invocation))
+                    tx_url = extract_transaction_hash(str(lock_reward_invocation))
                     tx_url = "https://solscan.io/tx/3Gxfg1Ewx1ChcQP1eApq8HdthL7KmJdH327nwikNsTjb2Qh4F8Dp7cyF2HuKF1ABabZLFsJpHExuSkH4uVAuefgs"
                     comment_body = format_reward_comment(reward, tx_url)
                     post_data = {"body": comment_body}
