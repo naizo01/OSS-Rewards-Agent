@@ -1,8 +1,11 @@
 import { PrivyClient } from "@privy-io/server-auth";
 import { encodePacked, keccak256 } from "viem";
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(405).end(); // メソッドがPOSTでない場合は405エラー
   }
@@ -19,10 +22,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const verifiedClaims = await privy.verifyAuthToken(authHeader);
 
-    // const {id, address, chainType} = await privy.walletApi.create({chainType: 'ethereum'});
-    // console.log("id", id);
-    // console.log("address", address);
-    // console.log("chainType", chainType);
+    /**
+curl --request POST https://api.privy.io/v1/policies \
+-u "<your-privy-app-id>:<your-privy-app-secret>" \
+-H "privy-app-id: <your-privy-app-id>" \
+-H 'Content-Type: application/json' \
+-d '{
+    "version": "1.0",
+    "name": "Allow Signing Only",
+    "chain_type": "ethereum",
+    "method_rules": [{
+      "method": "eth_signTransaction",
+      "rules": [{
+        "name": "Allow only signing",
+        "conditions": [],
+        "action": "ALLOW"
+      }]
+    }],
+    "default_action": "DENY"
+}'
+*/
+
+/**
+curl --request POST https://api.privy.io/v1/wallets \
+-u "<your-privy-app-id>:<your-privy-app-secret>" \
+-H "privy-app-id: <your-privy-app-id>" \
+-H "privy-authorization-signature: <authorization-signature-for-request>" \
+-H 'Content-Type: application/json' \
+-d '{
+  "chain_type": "ethereum",
+  "policy_ids": ["<your-policy-id>"]
+}'
+
+ */
 
     const user = await privy.getUserById(verifiedClaims.userId);
     console.log("user.github.username", user?.github?.username);
