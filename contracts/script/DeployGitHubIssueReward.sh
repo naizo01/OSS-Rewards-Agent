@@ -17,3 +17,6 @@ forge script script/DeployGitHubIssueReward.s.sol:DeployGitHubIssueReward \
   --etherscan-api-key $SCAN_API_KEY \
   -vvvv
   # --priority-gas-price 100000000 \
+
+
+  # sh script/DeployGitHubIssueReward.sh
