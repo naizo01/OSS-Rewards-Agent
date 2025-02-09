@@ -160,10 +160,11 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
         "repositoryName": repositoryName,
         "issueId": str(issueId),
         "reward": str(reward * 10**18),
-        "tokenAddress": TOKEN_ADDRESS,
-        "userAddress": userAddress,
-        "signature": signature
+        "tokenAddress": TOKEN_ADDRESS
+        # "userAddress": userAddress,
+        # "signature": signature
     }
+    print("lock_reward_args", lock_reward_args)
 
     try:
         lock_reward_invocation = wallet.invoke_contract(
