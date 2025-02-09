@@ -32,3 +32,14 @@ The system ensures secure reward distribution through:
 - GitHub account authentication requirement
 - Verification that only the contributor whose pull request was merged can claim the reward
 - Automated validation of contribution completion
+
+
+# Directory
+```
+.
+├── backend        # Implementation related to donor agent, donation agent, and GitHub monitoring
+├── contracts      # Implementation of lock_reward
+├── frontend       # Frontend implementation
+├── public         # Documentation and resources
+├── README.md      # Overview of this project
+```
