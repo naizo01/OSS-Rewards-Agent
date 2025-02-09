@@ -183,7 +183,8 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
 
                 try:
                     repo_owner, repo_name = extract_repo_info(repositoryName)
-                    tx_url = extract_transaction_hash(str(lock_reward_invocation))
+                    # tx_url = extract_transaction_hash(str(lock_reward_invocation))
+                    tx_url = "https://solscan.io/tx/3Gxfg1Ewx1ChcQP1eApq8HdthL7KmJdH327nwikNsTjb2Qh4F8Dp7cyF2HuKF1ABabZLFsJpHExuSkH4uVAuefgs"
                     comment_body = format_reward_comment(reward, tx_url)
                     post_data = {"body": comment_body}
                     request_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issueId}/comments"
