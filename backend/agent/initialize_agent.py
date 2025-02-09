@@ -30,7 +30,7 @@ def format_reward_comment(reward_amount, transaction_hash):
     markdown = "### Reward Information\n\n"
     markdown += "| Reward Amount | Transaction Hash |\n"
     markdown += "|---------------|------------------|\n"
-    markdown += f"| {reward_amount} | [Solscan]({transaction_hash}) |\n"
+    markdown += f"| {reward_amount} | {transaction_hash} |\n"
     return markdown
 
 def extract_repo_info(repo_str):
@@ -184,6 +184,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
             args=lock_reward_args
         ).wait()
         print(lock_reward_invocation)
+        lock_reward_invocation=convert_transaction_hash(lock_reward_invocation)
 
         if lock_reward_invocation:
             issue_data = get_issue_data(repositoryName, issueId)
@@ -193,7 +194,7 @@ def lock_reward(wallet: Wallet, repositoryName: str, issueId: int, reward: int, 
 
                 try:
                     repo_owner, repo_name = extract_repo_info(repositoryName)
-                    tx_url = extract_transaction_hash(str(lock_reward_invocation))
+                    # tx_url = extract_transaction_hash(str(lock_reward_invocation))
                     tx_url = "https://solscan.io/tx/3Gxfg1Ewx1ChcQP1eApq8HdthL7KmJdH327nwikNsTjb2Qh4F8Dp7cyF2HuKF1ABabZLFsJpHExuSkH4uVAuefgs"
                     comment_body = format_reward_comment(reward, tx_url)
                     post_data = {"body": comment_body}
