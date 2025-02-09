@@ -21,10 +21,7 @@ export default function ApproveToken() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await approveToken(
-        formData.spenderAddress as `0x${string}`,
-        BigInt(formData.amount)
-      );
+      await approveToken();
     } catch (error) {
       console.error(error);
     }
@@ -54,4 +51,4 @@ export default function ApproveToken() {
       </form>
     </div>
   );
-} 
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   usePrivy,
   getAccessToken,
@@ -21,7 +20,6 @@ import { Spinner } from "@/components/Spinner";
 export default function ClaimPage() {
   const { authenticated, ready } = usePrivy();
   const { initOAuth } = useLoginWithOAuth();
-  const searchParams = useSearchParams();
   const [state, setState] = useState<ClaimState>({
     status: "loading",
     reward: null,
@@ -44,11 +42,14 @@ export default function ClaimPage() {
 
   useEffect(() => {
     // クエリパラメータからissueIdを取得してステートに保存
-    const queryIssueId = searchParams ? searchParams.get("id") : null;
-    if (queryIssueId) {
-      setIssueId(Number(queryIssueId));
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const queryIssueId = params.get("id");
+      if (queryIssueId) {
+        setIssueId(Number(queryIssueId));
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(()=>{
     if(!authenticated){

@@ -27,7 +27,7 @@ const SignButton: React.FC<SignButtonProps> = ({ jsonData, handleSubmit }) => {
       },
     },
   });
-  console.log("allowance", allowance);
+
   const handleSign = () => {
     if (jsonData) {
       const repositoryName = jsonData.repositoryName.replace(
@@ -65,13 +65,13 @@ const SignButton: React.FC<SignButtonProps> = ({ jsonData, handleSubmit }) => {
       });
     }
   };
-  console.log(allowance && BigInt(allowance));
-  console.log(allowance && BigInt(allowance) > BigInt(jsonData.reward * 10 ** 18))
+
   return (
     <>
       {jsonData && (
         <div>
-          {allowance !== undefined && BigInt(allowance) < BigInt(jsonData.reward * 10 ** 18) ? (
+          {allowance !== undefined &&
+          BigInt(allowance) < BigInt(jsonData.reward * 10 ** 18) ? (
             <>
               <p className="text-red-600 mb-2">
                 Please approve the token before signing!

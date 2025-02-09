@@ -50,7 +50,7 @@ export default function useRewards({
       // Concatenate the issues array to the transformed rewards
       const combinedRewards = [...transformedRewards, ...issues];
 
-      onSuccess(combinedRewards);
+      onSuccess(combinedRewards as Issue[]);
 
       return { rewards: combinedRewards, error: null };
     } catch (error) {
