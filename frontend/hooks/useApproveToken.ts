@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -18,12 +18,20 @@ export function useApproveToken() {
     hash,
   });
 
+
+
   const { data: allowance, refetch: fetchAllowance } = useReadContract({
     address: TOKEN_ADDRESS,
     abi: erc20Abi,
     functionName: "allowance",
     args: [address as `0x${string}`, CONTRACT_ADDRESS as `0x${string}`],
   });
+
+  useEffect(() => {
+    if (!isConfirming) {
+      fetchAllowance();
+    }
+  }, [isConfirming]);
 
   const approveToken = async () => {
     try {

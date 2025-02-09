@@ -51,6 +51,7 @@ const SignButton: React.FC<SignButtonProps> = ({ jsonData, handleSubmit }) => {
           signData as [string, bigint, bigint, `0x${string}`, `0x${string}`]
         )
       );
+      console.log("messageHash", messageHash);
 
       const ethSignedMessageHash = keccak256(
         encodePacked(
@@ -64,12 +65,13 @@ const SignButton: React.FC<SignButtonProps> = ({ jsonData, handleSubmit }) => {
       });
     }
   };
-
+  console.log(allowance && BigInt(allowance));
+  console.log(allowance && BigInt(allowance) > BigInt(jsonData.reward * 10 ** 18))
   return (
     <>
       {jsonData && (
         <div>
-          {allowance && allowance < BigInt(jsonData.reward * 10 ** 18) ? (
+          {allowance !== undefined && BigInt(allowance) < BigInt(jsonData.reward * 10 ** 18) ? (
             <>
               <p className="text-red-600 mb-2">
                 Please approve the token before signing!
