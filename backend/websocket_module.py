@@ -32,7 +32,6 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
     and when the issue is closed, calls process_issue_event.
     """
     logging.info(f"Starting monitoring for issue #{issue_number} in {owner}/{repo}")
-    processed = False
 
     # while not processed:
     try:
@@ -44,14 +43,14 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
         if response.status_code != 200:
             logging.error(f"GitHub API error for {owner}/{repo} Issue #{issue_number}: {response.status_code} - {response.text}")
             time.sleep(POLL_INTERVAL)
-            # continue
+            return
 
         issue = response.json()
         closed_at = issue.get('closed_at')
         if closed_at is None:
             logging.info(f"Issue #{issue_number} in {owner}/{repo} is not closed yet. Waiting {POLL_INTERVAL} seconds...")
             time.sleep(POLL_INTERVAL)
-            # continue
+            return
 
         # Once the issue is closed, process it only once
         logging.info(f"Issue #{issue_number} in {owner}/{repo} has been closed at {closed_at}. Processing event...")
@@ -72,7 +71,6 @@ def monitor_specific_issue(socketio, agent_executor, config, owner, repo, issue_
             'issue_info': issue_info,
             'agent_response': agent_response
         })
-        # processed = True
         logging.info(f"Finished processing issue #{issue_number} in {owner}/{repo}. Exiting monitoring thread.")
     except Exception as e:
         logging.error(f"An error occurred while monitoring {owner}/{repo} Issue #{issue_number}: {e}")
@@ -90,6 +88,7 @@ def start_monitors(socketio, agent_executor, config):
         # 直接DBからリワード情報を取得
         rewards = get_rewards()
         logging.info(f"Number of rewards received: {len(rewards)}")
+        logging.info(f"Rewards: {rewards}")
 
         for reward in rewards:
             # reward はタプル形式 (repository_name, issue_id, reward_amount, id) を想定
