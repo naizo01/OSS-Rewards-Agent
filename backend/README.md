@@ -1,122 +1,104 @@
-## poetry 設定
+## POETRY SETTINGS
 
-### インストール
+#### install
 
-```
+````
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-### poetry の環境変数パス設定
+### set environment variable paths for poetry
 
 ```
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  # bash の場合
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc   # zsh の場合
+echo 'export PATH=“$HOME/.local/bin:$PATH”' >> ~/.bashrc # For bash
+echo 'export PATH=“$HOME/.local/bin:$PATH”' >> ~/.zshrc # for zsh
 ```
 
-### poetry バージョン確認
+### poetry version check (python 3.12 or higher recommended to run poetry)
 
 ```
 poetry --version
 ```
 
-### ライブラリインストール
+### library installation
 
 ```
 poetry install
 ```
 
-## pyenv の設定 （python のバージョン管理ツール）
 
-- backend ディレクトリ配下にて pyenv 3.12.6 を実行（3.10 以上推奨）
+## Environment Variables
+```` environment variables
+## Coinbase agentkit information
+CDP_API_KEY_NAME=
+CDP_API_KEY_PRIVATE_KEY=
+NETWORK_ID=
+MNEMONIC_PHRASE=
 
-```
-pyenv install 3.12.6
-pyenv local 3.12.6
-```
+# OpenAI API Key
+OPENAI_API_KEY=
 
-## python 実行環境 (venv) の設定
+# GitHub Repository information
+GITHUB_TOKEN=
+GITHUB_OWNER=
+GITHUB_REPO=
+LABEL_NAME=
 
-### 仮想環境構築&起動
-
-```
-python3.12 -m venv ai_hackathon
-source ai_hackathon/bin/activate
-```
-
-### 終了
-
-```
-deactivate
+CONTRACT_ADDRESS=
+GITHUB_API_URL="https://api.github.com”
 ```
 
-## 環境変数
-
-- ひとまず.env に対応したものは後ほどあげます。ターミナルで以下のコマンドをお願いします。
-
-```
-export CDP_API_KEY_NAME="organizations/ee..."
-export CDP_API_KEY_PRIVATE_KEY="-----BEGIN EC PRIVATE KEY-----\...\n-----END EC PRIVATE KEY-----\n"
-export OPENAI_API_KEY="sk-.."
-export NETWORK_ID="base-sepolia"
-```
-
-## サーバー起動 プロジェクト root（すなわち agent-private 直下）にて以下を実行
-
-```
-python -m backend.app
-```
-
-上記で動作しない場合、backend ディレクトリに遷移後、下記コマンド実行で動作する可能性がある。
-
+## Start the server Run the following directly under root/backend.
 ```
 poetry run python -m app
 ```
 
-## リクエストとレスポンス確認
+## Check request and response
 
-- リクエスト
+- Request: ```` -m
 
 ```
 curl -X POST http://localhost:5001/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "NFTを発行したい"}'
+  -H “Content-Type: application/json” \}
+  -d '{“message”: “I want to issue an NFT”}'
 ```
 
-- レスポンス
+- Response.
 
 ```
-{"response": "まず、NFTの発行に必要な情報を教えてください。\n\n1. NFTコレクションの名前（例: \"Helpful Hippos\"）\n2. NFTコレクションのシンボル（例: \"HIPPO\"）\n3. トークンメタデータのベースURI（例: \"https://www.helpfulhippos.xyz/metadata/\"）\n\nこれらの情報を教えていただければ、NFTを発行します。"}%
+{“response”: “First, what information do you need to issue an NFT? \The name of the NFT collection (e.g.\“Helpful Hippos\”)}n2. the symbol of the NFT collection (e.g.\“HIPPO\”)}n3. the base URI of the token metadata (e.g.\"https://www.helpfulhippos.xyz/ metadata/\“\”/metadata/\“}\nGive us this information and we will issue an NFT.”} %
 ```
 
 ## API Usage
 
-The application exposes a chat endpoint that accepts natural language commands for blockchain interactions:
+The application exposes a chat endpoint that accepts natural language commands for blockchain interactions:.
 
 ```bash
 curl -X POST http://localhost:5001/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Please tell me the wallet address that the agent will operate.", "conversation_id": 0}'
+  -H “Content-Type: application/json” \}
+  -d '{“input”: “Please tell me the wallet address that the agent will operate.”, “conversation_id”: 0}'
 ```
 
-```bash
+````bash
 curl -X POST http://localhost:5000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"input": "What should I do?", "conversation_id": 0}'
+  -H “Content-Type: application/json” \}
+  -d '{“input”: “What should I do?”, “conversation_id”: 0}'
 ```
-```bash
+````bash
 curl -X POST http://localhost:5001/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"input": "I want to execute the lockReward function. The repository is https://github.com/naizo01/agentic. The issue is 1. The amount is 1000 tokens.", "conversation_id": 0}'
-```
-```bash
-curl -X POST http://localhost:5001/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Execute the transaction", "conversation_id": 0}'
+  -H “Content-Type: application/json” \}
+  -d '{“input”: “I want to execute the lockReward function. The repository is https://github.com/naizo01/agentic. The issue is 1. The amount is 1000 The amount is 1000 tokens.”, ‘conversation_id’: 0}'
+````bash
+````bash
+curl -X POST http://localhost:5001/api/chat \}
+  -H “Content-Type: application/json” \}
+  -d '{“input”: “Execute the transaction”, “conversation_id”: 0}'
 ```
 
 
-Retrieve a list of rewards by the agent:
+Retrieve a list of rewards by the agent: ````bash
 
 ```bash
 curl http://localhost:5001/rewards 
 ```
+
+Translated with DeepL.com (free version)
