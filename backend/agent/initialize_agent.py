@@ -30,7 +30,7 @@ def format_reward_comment(reward_amount, transaction_hash):
     markdown = "### Reward Information\n\n"
     markdown += "| Reward Amount | Transaction Hash |\n"
     markdown += "|---------------|------------------|\n"
-    markdown += f"| {reward_amount} | {transaction_hash} |\n"
+    markdown += f"| {reward_amount} | [Solscan]({transaction_hash}) |\n"
     return markdown
 
 def extract_repo_info(repo_str):
