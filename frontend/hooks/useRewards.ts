@@ -40,10 +40,11 @@ export default function useRewards({
       const transformedRewards: Issue[] = rewards.map((reward: any) => ({
         id: reward[3], // Assuming this is the global ID
         issueId: reward[1], // Issue ID within the repository
-        title: "Untitled Issue", // Default title for issues without a title
+        title: reward[5], // Default title for issues without a title
         status: "Open", // Assuming all rewards are for open issues
         donations: reward[2], // Reward amount
         repo: reward[0], // Repository name
+        description: reward[6],
       }));
 
       // Concatenate the issues array to the transformed rewards

@@ -56,7 +56,7 @@ export default function Home() {
             </div>
             <div className="md:w-1/2">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/991%20(1)-TgrfqX3hHCnYNCRzrH7MJ3vQDIqDX4.png"
+                src="/image/991.png"
                 alt="OSS Rewards Platform"
                 width={500}
                 height={400}
@@ -75,7 +75,7 @@ export default function Home() {
             <div className="text-center">
               <div className="mb-4 flex justify-center">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/735-TbKTuaLG6I5uq0fYElIfACnLFnzVL9.png"
+                  src="/image/735.png"
                   alt="Choose an Issue"
                   width={200}
                   height={200}
@@ -91,7 +91,7 @@ export default function Home() {
             <div className="text-center">
               <div className="mb-4 flex justify-center">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/985%20(1)-aNd0pCDGOm5s5BbzEkPhHtcNMChjYy.png"
+                  src="/image/985.png"
                   alt="Make a Donation"
                   width={200}
                   height={200}

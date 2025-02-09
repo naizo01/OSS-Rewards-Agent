@@ -25,7 +25,7 @@ export default function Header() {
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nNnTXyPctT28YAz1738562866_1738562875-OI7hr77gSFg2tWsrJgAnHGcfAPiyVJ.png"
+                src="/image/logo.png"
                 alt="OSS Rewards"
                 width={32}
                 height={32}

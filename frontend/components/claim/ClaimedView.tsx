@@ -12,7 +12,7 @@ export function ClaimedView({ amount, onReset }: ClaimedViewProps) {
   return (
     <div className="text-center">
       <Image
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1051-x1S5njsLE9NOy7QLRYrjqf4rGqpo38.png"
+        src="/image/1051.png"
         alt="Success"
         width={120}
         height={120}
