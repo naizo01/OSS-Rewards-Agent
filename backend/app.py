@@ -24,6 +24,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 CORS(app, resources={r"/*": {"origins": "http://localhost:3001"}})
 CORS(app, resources={r"/*": {"origins": "http://localhost:3002"}})
+CORS(app, resources={r"/*": {"origins": "https://frontend-991346403603.asia-east2.run.app"}})
 
 # Setup SQLite tables
 setup()
