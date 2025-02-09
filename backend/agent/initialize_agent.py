@@ -66,6 +66,8 @@ def extract_transaction_hash(response_text):
 import re
 
 def convert_transaction_hash(response_text):
+    if not isinstance(response_text, str):
+        response_text = str(response_text)  # 文字列でない場合、変換
     match = re.search(r"https://sepolia\.basescan\.org/tx/\S+", response_text)
     if match:
         return re.sub(r"https://sepolia\.basescan\.org/tx/\S+", 
