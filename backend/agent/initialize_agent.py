@@ -5,7 +5,7 @@ import requests
 
 import constants
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
@@ -209,7 +209,7 @@ def initialize_agent():
     Returns a tuple containing the agent executor and configuration.
     """
     # Initialize the LLM
-    llm = ChatOpenAI(model=constants.AGENT_MODEL)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite-preview-02-05")
 
     # Retrieve wallet information from environment variables or the database
     wallet_id = os.getenv(constants.WALLET_ID_ENV_VAR)

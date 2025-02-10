@@ -16,7 +16,7 @@ class InputValidationError(Exception):
     pass
 
 # Agent
-AGENT_MODEL: Final[str] = "gpt-4o-mini"
+AGENT_MODEL: Final[str] = "gemini-2.0-flash-lite-preview-02-05"
 AGENT_PROMPT: Final[str] = (
     "You are a specialized agent designed to execute the lockReward function on the blockchain. "
     "Your task is to gather the necessary information: the user's Ethereum address, the GitHub repository name (which can be in the format 'owner/repository' or a full URL), the issue ID, and the amount in USD the user wishes to donate. "

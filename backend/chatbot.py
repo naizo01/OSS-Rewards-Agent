@@ -2,7 +2,7 @@
 import os
 import logging
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
@@ -21,7 +21,7 @@ wallet_data_file = "wallet_data.json"
 
 def initialize_agent():
     """Initialize the agent with CDP Agentkit."""
-    llm = ChatOpenAI(model="gpt-4o-mini")
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite-preview-02-05")
 
     # Configure CDP Agentkit Langchain Extension.
     values = {}

@@ -2,7 +2,7 @@
 
 #### install
 
-````
+`````
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
@@ -34,8 +34,8 @@ CDP_API_KEY_PRIVATE_KEY=
 NETWORK_ID=
 MNEMONIC_PHRASE=
 
-# OpenAI API Key
-OPENAI_API_KEY=
+# Google API Key
+GOOGLE_API_KEY=
 
 # GitHub Repository information
 GITHUB_TOKEN=
@@ -98,7 +98,8 @@ curl -X POST http://localhost:5001/api/chat \}
 Retrieve a list of rewards by the agent: ````bash
 
 ```bash
-curl http://localhost:5001/rewards 
+curl http://localhost:5001/rewards
 ```
 
 Translated with DeepL.com (free version)
+`````

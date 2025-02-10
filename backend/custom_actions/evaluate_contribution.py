@@ -7,7 +7,7 @@ from db.rewards import mark_reward_as_merged, get_reward_id
 from pydantic import BaseModel, Field
 
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from cdp import Wallet
 import settings.logging  # noqa: F401
 import settings.env  # noqa: F401
@@ -315,7 +315,7 @@ def evaluate_contribution(
     logging.info(f"Input for the LLM: {prompt}")
 
     # Query the LLM
-    llm = ChatOpenAI(model="gpt-4o-mini")
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite-preview-02-05")
     response = llm.invoke([HumanMessage(content=prompt)])
     logging.info(f"Response from the LLM: {response.content}")
     
